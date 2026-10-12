@@ -1,0 +1,30 @@
+! CAM7 / FV f09 (192 x 288) / MAM4 mode order a1,a2,a3,a4.
+! Merge these assignments into your case-root user_nl_cam after installing
+! the source, integration patches, and XML entries described in README.md.
+! Replace the three paths and preserve your existing case settings.
+! CAM generates the namelist groups; do not add group delimiters here.
+
+! AOD observations on the exact f09 grid. The trailing slash is required.
+aod_nudge_on = .true.
+aod_obs_path = '/path/to/AOD_f09_3hr/'
+aod_obs_template = 'MODIS_VIIRS_AOD_3hr_f09.%y%m%d.%s.nc'
+aod_times_per_day = 8
+aod_aci_on = .false.
+aod_diag_on = .true.
+
+! Copy the required LUT from this Derecho path into your input-data storage:
+! /glade/work/fillmore/Data/CERES-SARB-CAM7/optics/aod_lfl_lut_mam4_camref_dense3_20260709.nc
+! Write instantaneous 3D extinction, scattering, and asymmetry at all model
+! levels in 26 separate band files (14 SW + 12 LW), every three hours.
+aod_optics_on = .true.
+aod_optics_method = 'lut'
+aod_optics_lut_file = '/path/to/optics/aod_lfl_lut_mam4_camref_dense3_20260709.nc'
+aod_optics_outdir = '/path/to/output/band_optics'
+aod_optics_interval_hours = 3
+aod_optics_template = 'AER_MAM4_{band}.%y%m%d.%s.nc'
+aod_optics_band_file = ''
+aod_optics_lw_table = ''
+
+! No fincl entries are needed for the spectral files. To save AOD constraint
+! diagnostics as well, append these names to your chosen history fincl list:
+! AODNDG_OBS, AODNDG_MODEL_PRE, AODNDG_MODEL_POST, AODNDG_RATIO, AODNDG_MASK

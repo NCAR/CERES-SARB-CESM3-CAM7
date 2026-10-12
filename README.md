@@ -49,7 +49,8 @@ LFL spectral bands are not identical monochromatic quantities.
 
 ## File inventory
 
-There are 23 files under `src/cam/`. All 12 modules are needed by the supplied
+There are 24 files under `src/cam/`, including a case-settings example.
+All 12 modules are needed by the supplied
 build configuration, including when only one optics method is selected at
 runtime.
 
@@ -92,6 +93,7 @@ also call them, compile them, and recognize their namelist settings.
 | --- | --- |
 | [namelist/namelist_definition.xml](src/cam/namelist/namelist_definition.xml) | CAM definition snapshot containing the `aod_nudging_nl` and `aod_optics_nl` entries. Merge those entries into `bld/namelist_files/namelist_definition.xml`. |
 | [namelist/namelist_defaults_cam.xml](src/cam/namelist/namelist_defaults_cam.xml) | CAM defaults snapshot containing the added `aod_*` defaults. Merge those defaults into `bld/namelist_files/namelist_defaults_cam.xml`. |
+| [namelist/user_nl_cam.example](src/cam/namelist/user_nl_cam.example) | Case-settings example enabling AOD constraints and 3D spectral output. Edit the paths and merge the assignments into the recipient's case-root `user_nl_cam`. |
 | [test/CMakeLists.txt](src/cam/test/CMakeLists.txt) | CAM/pFUnit test build integration. |
 | [test/test_aod_nudging_kernel.pf](src/cam/test/test_aod_nudging_kernel.pf) | Tests nudging ratios and observation interpolation/masks. |
 | [test/test_aod_optics_kernel.pf](src/cam/test/test_aod_optics_kernel.pf) | Tests remapping and optical-property calculations. |
@@ -220,7 +222,14 @@ The installation above lets recipients retain their own case and input choices.
 
 ## Minimal runtime settings
 
-Merge this block into the recipient's `user_nl_cam`, replacing the three paths.
+The case-settings file is
+[`src/cam/namelist/user_nl_cam.example`](src/cam/namelist/user_nl_cam.example).
+The XML files beside it define valid options and defaults for CAM's namelist
+builder. The recipient puts their chosen values in the case-root `user_nl_cam`;
+CAM then generates the `&aod_nudging_nl` and `&aod_optics_nl` groups in `atm_in`.
+
+Merge the example's assignments (also shown below) into the recipient's
+`user_nl_cam`, replacing the three paths and preserving their other case settings.
 Use assignments without enclosing namelist group delimiters; CAM's
 `build-namelist` places them in the appropriate groups.
 
@@ -239,9 +248,15 @@ aod_optics_method = 'lut'
 aod_optics_lut_file = '/path/to/optics/aod_lfl_lut_mam4_camref_dense3_20260709.nc'
 aod_optics_outdir = '/path/to/output/band_optics'
 aod_optics_interval_hours = 3
+aod_optics_template = 'AER_MAM4_{band}.%y%m%d.%s.nc'
 aod_optics_band_file = ''
 aod_optics_lw_table = ''
 ```
+
+This example enables 3D layer extinction optical depth, scattering optical
+depth, and asymmetry across the f09 grid and all model levels for every band.
+The spectral files require no `fincl` entries. External observation files and
+the LUT are still required; the example does not supply those data.
 
 Both features default to off. The code's default optics method remains
 `remap`, so set `lut` explicitly to use the supplied LFL-native table. Optics
