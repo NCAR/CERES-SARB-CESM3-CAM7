@@ -2,7 +2,7 @@ diff --git a/bld/build-namelist b/bld/build-namelist
 index f6a87f40..b75513b7 100755
 --- a/bld/build-namelist
 +++ b/bld/build-namelist
-@@ -455,6 +455,29 @@ if ($print>=2) {
+@@ -455,5 +455,28 @@ if ($print>=2) {
  # Composition of air
  add_default($nl, 'dry_air_species');
  add_default($nl, 'water_species_in_air');
