@@ -1,0 +1,33 @@
+diff --git a/bld/build-namelist b/bld/build-namelist
+index f6a87f40..b75513b7 100755
+--- a/bld/build-namelist
++++ b/bld/build-namelist
+@@ -455,6 +455,29 @@ if ($print>=2) {
+ # Composition of air
+ add_default($nl, 'dry_air_species');
+ add_default($nl, 'water_species_in_air');
++
++# AOD nudging
++add_default($nl, 'aod_nudge_on');
++add_default($nl, 'aod_obs_template');
++add_default($nl, 'aod_beg_ymd');
++add_default($nl, 'aod_end_ymd');
++add_default($nl, 'aod_times_per_day');
++add_default($nl, 'aod_ratio_min');
++add_default($nl, 'aod_ratio_max');
++add_default($nl, 'aod_eps');
++add_default($nl, 'aod_aci_on');
++add_default($nl, 'aod_diag_on');
++
++# SP3 aerosol optics diagnostics
++add_default($nl, 'aod_optics_on');
++add_default($nl, 'aod_optics_interval_hours');
++add_default($nl, 'aod_optics_outdir');
++add_default($nl, 'aod_optics_template');
++add_default($nl, 'aod_optics_band_file');
++add_default($nl, 'aod_optics_lw_table');
++add_default($nl, 'aod_optics_method');
++add_default($nl, 'aod_optics_lut_file');
++
+ # Spectral Element dycore
+ my $dyn = $cfg->get('dyn');

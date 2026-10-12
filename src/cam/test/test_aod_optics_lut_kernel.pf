@@ -1,0 +1,74 @@
+module test_aod_optics_lut_kernel
+
+use funit
+use shr_kind_mod, only: r8 => shr_kind_r8
+use aod_optics_lut_kernel, only: cheb_basis, eval_coeff_table, &
+                                 mix_refindex, lut_scatter
+
+implicit none
+
+contains
+
+  @Test
+  subroutine cheb_basis_center_radius()
+    real(r8) :: basis(4)
+
+    call cheb_basis(4, sqrt(0.01e-6_r8*25.e-6_r8), basis)
+
+    @assertEqual(1._r8,  basis(1), tolerance=1.e-12_r8)
+    @assertEqual(0._r8,  basis(2), tolerance=1.e-12_r8)
+    @assertEqual(-1._r8, basis(3), tolerance=1.e-12_r8)
+    @assertEqual(0._r8,  basis(4), tolerance=1.e-12_r8)
+  end subroutine cheb_basis_center_radius
+
+  @Test
+  subroutine eval_coeff_table_bilinear_midpoint()
+    real(r8) :: re_axis(2), im_axis(2), basis(1)
+    real(r8) :: table(1,2,2)
+    real(r8) :: value
+
+    re_axis = [1._r8, 3._r8]
+    im_axis = [0._r8, 2._r8]
+    basis = [1._r8]
+    table(1,1,1) = 2._r8
+    table(1,2,1) = 4._r8
+    table(1,1,2) = 6._r8
+    table(1,2,2) = 8._r8
+
+    call eval_coeff_table(1, 2, 2, re_axis, im_axis, table, basis, &
+                          2._r8, 1._r8, .false., value)
+
+    @assertEqual(2.5_r8, value, tolerance=1.e-12_r8)
+  end subroutine eval_coeff_table_bilinear_midpoint
+
+  @Test
+  subroutine mix_refindex_volume_limits()
+    real(r8) :: vols(2), ref_re(2), ref_im(2)
+    real(r8) :: mix_re, mix_im
+
+    vols = [2._r8, 0._r8]
+    ref_re = [1.5_r8, 1.9_r8]
+    ref_im = [0.01_r8, 0.03_r8]
+    call mix_refindex(2, vols, ref_re, ref_im, 0._r8, 1.33_r8, 0._r8, &
+                      2._r8, mix_re, mix_im)
+    @assertEqual(1.5_r8,  mix_re, tolerance=1.e-12_r8)
+    @assertEqual(0.01_r8, mix_im, tolerance=1.e-12_r8)
+
+    call mix_refindex(2, [0._r8, 0._r8], ref_re, ref_im, 1._r8, 1.33_r8, 0._r8, &
+                      1._r8, mix_re, mix_im)
+    @assertEqual(1.33_r8, mix_re, tolerance=1.e-12_r8)
+    @assertEqual(0._r8,   mix_im, tolerance=1.e-12_r8)
+  end subroutine mix_refindex_volume_limits
+
+  @Test
+  subroutine lut_scatter_clamps_invariants()
+    real(r8) :: ext, sca, scag
+
+    call lut_scatter(0.2_r8, 0.3_r8, 1.5_r8, ext, sca, scag)
+
+    @assertEqual(0.2_r8, ext,  tolerance=1.e-12_r8)
+    @assertEqual(0._r8,  sca,  tolerance=1.e-12_r8)
+    @assertEqual(0._r8,  scag, tolerance=1.e-12_r8)
+  end subroutine lut_scatter_clamps_invariants
+
+end module test_aod_optics_lut_kernel

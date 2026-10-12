@@ -1,0 +1,101 @@
+module test_aod_nudging_kernel
+
+use funit
+use shr_kind_mod, only: r8 => shr_kind_r8
+use aod_nudging_kernel, only: compute_ratio, interp_weight, combine_snapshots, AOD_FILL
+
+implicit none
+
+contains
+
+  @Test
+  subroutine ratio_basic()
+    ! obs 0.4 / model 0.2 = 2.0, inside [0.1,10]
+    real(r8) :: r
+    r = compute_ratio(0.4_r8, 0.2_r8, .true., 0.01_r8, 0.1_r8, 10._r8)
+    @assertEqual(2.0_r8, r, tolerance=1.e-12_r8)
+  end subroutine ratio_basic
+
+  @Test
+  subroutine ratio_clamps_high()
+    ! 5.0/0.01 = 500 -> clamp to rmax=10
+    real(r8) :: r
+    r = compute_ratio(5.0_r8, 0.01_r8, .true., 0.001_r8, 0.1_r8, 10._r8)
+    @assertEqual(10._r8, r, tolerance=1.e-12_r8)
+  end subroutine ratio_clamps_high
+
+  @Test
+  subroutine ratio_clamps_low()
+    ! 0.001/1.0 = 0.001 -> clamp to rmin=0.1
+    real(r8) :: r
+    r = compute_ratio(0.001_r8, 1.0_r8, .true., 0.01_r8, 0.1_r8, 10._r8)
+    @assertEqual(0.1_r8, r, tolerance=1.e-12_r8)
+  end subroutine ratio_clamps_low
+
+  @Test
+  subroutine ratio_skips_when_model_near_zero()
+    ! computed < eps -> ratio = 1 (no change)
+    real(r8) :: r
+    r = compute_ratio(0.4_r8, 0.005_r8, .true., 0.01_r8, 0.1_r8, 10._r8)
+    @assertEqual(1.0_r8, r, tolerance=1.e-12_r8)
+  end subroutine ratio_skips_when_model_near_zero
+
+  @Test
+  subroutine ratio_skips_when_invalid()
+    real(r8) :: r
+    r = compute_ratio(0.4_r8, 0.2_r8, .false., 0.01_r8, 0.1_r8, 10._r8)
+    @assertEqual(1.0_r8, r, tolerance=1.e-12_r8)
+  end subroutine ratio_skips_when_invalid
+
+  @Test
+  subroutine ratio_skips_on_fill()
+    ! fill (-999) target -> no change even if mask were true
+    real(r8) :: r
+    r = compute_ratio(AOD_FILL, 0.2_r8, .true., 0.01_r8, 0.1_r8, 10._r8)
+    @assertEqual(1.0_r8, r, tolerance=1.e-12_r8)
+  end subroutine ratio_skips_on_fill
+
+  @Test
+  subroutine weight_midpoint()
+    @assertEqual(0.5_r8, interp_weight(150._r8, 100._r8, 200._r8), tolerance=1.e-12_r8)
+  end subroutine weight_midpoint
+
+  @Test
+  subroutine weight_clamped_and_degenerate()
+    ! before curr
+    @assertEqual(0._r8, interp_weight(50._r8,  100._r8, 200._r8), tolerance=1.e-12_r8)
+    ! after next
+    @assertEqual(1._r8, interp_weight(250._r8, 100._r8, 200._r8), tolerance=1.e-12_r8)
+    ! denom<=0
+    @assertEqual(0._r8, interp_weight(150._r8, 100._r8, 100._r8), tolerance=1.e-12_r8)
+  end subroutine weight_clamped_and_degenerate
+
+  @Test
+  subroutine combine_both_valid()
+    real(r8) :: t
+    logical  :: v
+    call combine_snapshots(0.2_r8, 0.4_r8, .true., .true., 0.5_r8, t, v)
+    @assertTrue(v)
+    @assertEqual(0.3_r8, t, tolerance=1.e-12_r8)
+  end subroutine combine_both_valid
+
+  @Test
+  subroutine combine_one_valid()
+    real(r8) :: t
+    logical  :: v
+    call combine_snapshots(0.2_r8, AOD_FILL, .true., .false., 0.5_r8, t, v)
+    @assertTrue(v)
+    ! uses curr, ignores weight
+    @assertEqual(0.2_r8, t, tolerance=1.e-12_r8)
+  end subroutine combine_one_valid
+
+  @Test
+  subroutine combine_none_valid()
+    real(r8) :: t
+    logical  :: v
+    call combine_snapshots(AOD_FILL, AOD_FILL, .false., .false., 0.5_r8, t, v)
+    @assertFalse(v)
+    @assertEqual(AOD_FILL, t, tolerance=1.e-12_r8)
+  end subroutine combine_none_valid
+
+end module test_aod_nudging_kernel

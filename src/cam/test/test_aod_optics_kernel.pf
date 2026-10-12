@@ -1,0 +1,96 @@
+module test_aod_optics_kernel
+
+use funit
+use shr_kind_mod, only: r8 => shr_kind_r8
+use aod_optics_kernel, only: overlap_weights, remap_extensive, lw_scatter, &
+                             asym_from_scaweighted, clamp_layer, TAU_THRESH, OMEGA_CAP
+
+implicit none
+
+contains
+
+  @Test
+  subroutine weights_tiling_average_sum_to_one()
+    real(r8) :: w(1,2), coverage(1)
+    call overlap_weights(2, [0._r8, 1._r8], [1._r8, 2._r8], &
+                         1, [0._r8], [2._r8], w, coverage)
+    @assertEqual(0.5_r8, w(1,1), tolerance=1.e-12_r8)
+    @assertEqual(0.5_r8, w(1,2), tolerance=1.e-12_r8)
+    @assertEqual(1._r8, coverage(1), tolerance=1.e-12_r8)
+  end subroutine weights_tiling_average_sum_to_one
+
+  @Test
+  subroutine weights_subset_preserves_source_value()
+    real(r8) :: w(1,1), coverage(1)
+    call overlap_weights(1, [0._r8], [2._r8], 1, [0._r8], [1._r8], w, coverage)
+    @assertEqual(1._r8, w(1,1), tolerance=1.e-12_r8)
+    @assertEqual(1._r8, coverage(1), tolerance=1.e-12_r8)
+  end subroutine weights_subset_preserves_source_value
+
+  @Test
+  subroutine weights_partial_destination_coverage()
+    real(r8) :: w(1,1), coverage(1)
+    call overlap_weights(1, [0._r8], [1._r8], 1, [0._r8], [2._r8], w, coverage)
+    @assertEqual(1._r8, w(1,1), tolerance=1.e-12_r8)
+    @assertEqual(0.5_r8, coverage(1), tolerance=1.e-12_r8)
+  end subroutine weights_partial_destination_coverage
+
+  @Test
+  subroutine weights_no_overlap_zero()
+    real(r8) :: w(1,1)
+    call overlap_weights(1, [0._r8], [1._r8], 1, [2._r8], [3._r8], w)
+    @assertEqual(0._r8, w(1,1), tolerance=1.e-12_r8)
+  end subroutine weights_no_overlap_zero
+
+  @Test
+  subroutine remap_returns_band_representative_od()
+    real(r8) :: w(1,2), dst(1)
+    call overlap_weights(2, [0._r8, 1._r8], [1._r8, 2._r8], &
+                         1, [0._r8], [2._r8], w)
+    dst = remap_extensive(2, 1, w, [0.3_r8, 0.5_r8])
+    @assertEqual(0.4_r8, dst(1), tolerance=1.e-12_r8)
+  end subroutine remap_returns_band_representative_od
+
+  @Test
+  subroutine lw_scatter_basic()
+    real(r8) :: ext, sca, scag
+    call lw_scatter(0.10_r8, 0.5_r8, 0.6_r8, OMEGA_CAP, ext, sca, scag)
+    @assertEqual(0.20_r8, ext,  tolerance=1.e-12_r8)
+    @assertEqual(0.10_r8, sca,  tolerance=1.e-12_r8)
+    @assertEqual(0.06_r8, scag, tolerance=1.e-12_r8)
+  end subroutine lw_scatter_basic
+
+  @Test
+  subroutine lw_scatter_omega_zero_is_absorption_only()
+    real(r8) :: ext, sca, scag
+    call lw_scatter(0.10_r8, 0._r8, 0.6_r8, OMEGA_CAP, ext, sca, scag)
+    @assertEqual(0.10_r8, ext,  tolerance=1.e-12_r8)
+    @assertEqual(0._r8,   sca,  tolerance=1.e-12_r8)
+    @assertEqual(0._r8,   scag, tolerance=1.e-12_r8)
+  end subroutine lw_scatter_omega_zero_is_absorption_only
+
+  @Test
+  subroutine lw_scatter_caps_omega()
+    real(r8) :: ext, sca, scag
+    call lw_scatter(0.10_r8, 0.99_r8, 0.6_r8, OMEGA_CAP, ext, sca, scag)
+    @assertEqual(1.0_r8, ext, tolerance=1.e-12_r8)
+  end subroutine lw_scatter_caps_omega
+
+  @Test
+  subroutine asym_weighted_and_threshold()
+    @assertEqual(0.6_r8, asym_from_scaweighted(0.06_r8, 0.10_r8, TAU_THRESH), tolerance=1.e-12_r8)
+    @assertEqual(0._r8,  asym_from_scaweighted(0.06_r8, 1.e-9_r8, TAU_THRESH), tolerance=1.e-12_r8)
+  end subroutine asym_weighted_and_threshold
+
+  @Test
+  subroutine clamp_enforces_invariants()
+    real(r8) :: ext, sca, asym
+    ext = 0.2_r8
+    sca = 0.3_r8
+    asym = 1.5_r8
+    call clamp_layer(ext, sca, asym)
+    @assertEqual(0.2_r8, sca,  tolerance=1.e-12_r8)
+    @assertEqual(1.0_r8, asym, tolerance=1.e-12_r8)
+  end subroutine clamp_enforces_invariants
+
+end module test_aod_optics_kernel

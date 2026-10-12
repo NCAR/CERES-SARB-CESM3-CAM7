@@ -1,0 +1,71 @@
+diff --git a/src/physics/cam7/physpkg.F90 b/src/physics/cam7/physpkg.F90
+index a3f0c49f..89786743 100644
+--- a/src/physics/cam7/physpkg.F90
++++ b/src/physics/cam7/physpkg.F90
+@@ -768,6 +768,8 @@ contains
+     use dadadj_cam,         only: dadadj_cam_init
+     use cam_abortutils,     only: endrun
+     use nudging,            only: Nudge_Model, nudging_init
++    use aod_nudging_intr,   only: aod_nudge_on, aod_nudging_init
++    use aod_optics_diag_intr, only: aod_optics_on, aod_optics_init
+     use cam_snapshot,       only: cam_snapshot_init
+     use cam_history,        only: addfld, register_vector_field, add_default
+     use cam_budget,         only: cam_budget_init
+@@ -954,6 +956,8 @@ contains
+     ! Initialize Nudging Parameters
+     !--------------------------------
+     if(Nudge_Model) call nudging_init
++    if (aod_nudge_on) call aod_nudging_init()
++    if (aod_optics_on) call aod_optics_init()
+ 
+     if (clim_modal_aero) then
+ 
+@@ -1412,6 +1416,8 @@ contains
+     use qneg_module,        only: qneg4
+     use co2_cycle,          only: co2_cycle_set_ptend
+     use nudging,            only: Nudge_Model,Nudge_ON,nudging_timestep_tend
++    use aod_nudging_intr,   only: aod_nudge_on, aod_nudge_active, aod_nudging_timestep_tend
++    use aod_optics_diag_intr, only: aod_optics_on, aod_optics_timestep_tend
+     use cam_snapshot,       only: cam_snapshot_all_outfld_tphysac
+     use cam_snapshot_common,only: cam_snapshot_ptend_outfld
+     use lunar_tides,        only: lunar_tides_tend
+@@ -2016,6 +2022,21 @@ contains
+ 
+    endif
+ 
++    !===================================================
++    ! AOD nudging: overwrite aerosol mass+number before radiation
++    !===================================================
++    if (aod_nudge_on .and. aod_nudge_active) then
++       call t_startf('aod_nudging')
++       call aod_nudging_timestep_tend(state, tend, pbuf, ztodt)
++       call t_stopf('aod_nudging')
++    end if
++
++    if (aod_optics_on) then
++       call t_startf('aod_optics_diag')
++       call aod_optics_timestep_tend(state, pbuf)
++       call t_stopf('aod_optics_diag')
++    end if
++
+     !===================================================
+     ! Moist physical parameteriztions complete:
+     ! send dynamical variables, and derived variables to history file
+@@ -3044,6 +3065,8 @@ subroutine phys_timestep_init(phys_state, cam_in, cam_out, pbuf2d)
+   use epp_ionization,      only: epp_ionization_active
+   use iop_forcing,         only: scam_use_iop_srf
+   use nudging,             only: Nudge_Model, nudging_timestep_init
++  use aod_nudging_intr,    only: aod_nudge_on, aod_nudging_timestep_init
++  use aod_optics_diag_intr, only: aod_optics_on, aod_optics_timestep_init
+   use waccmx_phys_intr,    only: waccmx_phys_ion_elec_temp_timestep_init
+   use phys_grid_ctem,      only: phys_grid_ctem_diags
+   use surface_emissions_mod,only: surface_emissions_adv
+@@ -3116,6 +3139,8 @@ subroutine phys_timestep_init(phys_state, cam_in, cam_out, pbuf2d)
+   ! Update Nudging values, if needed
+   !----------------------------------
+   if(Nudge_Model) call nudging_timestep_init(phys_state)
++  if (aod_nudge_on) call aod_nudging_timestep_init(phys_state)
++  if (aod_optics_on) call aod_optics_timestep_init(phys_state)
+ 
+   ! Update TEM diagnostics
+   call phys_grid_ctem_diags(phys_state)

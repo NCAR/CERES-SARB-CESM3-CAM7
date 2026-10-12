@@ -1,0 +1,22 @@
+diff --git a/src/control/runtime_opts.F90 b/src/control/runtime_opts.F90
+index 168b93d5..f61ffea7 100644
+--- a/src/control/runtime_opts.F90
++++ b/src/control/runtime_opts.F90
+@@ -88,6 +88,8 @@ subroutine read_namelist(nlfilename, single_column, scmlat, scmlon)
+    use rate_diags,          only: rate_diags_readnl
+    use tracers,             only: tracers_readnl
+    use nudging,             only: nudging_readnl
++   use aod_nudging_intr,    only: aod_nudging_readnl
++   use aod_optics_diag_intr,only: aod_optics_readnl
+ #if ( defined SIMPLE )
+    use frierson_cam,        only: frierson_readnl
+ #endif
+@@ -197,6 +199,8 @@ subroutine read_namelist(nlfilename, single_column, scmlat, scmlon)
+    call rate_diags_readnl(nlfilename)
+    call scam_readnl(nlfilename, single_column, scmlat, scmlon)
+    call nudging_readnl(nlfilename)
++   call aod_nudging_readnl(nlfilename)
++   call aod_optics_readnl(nlfilename)
+ #if ( defined SIMPLE )
+    call frierson_readnl(nlfilename)
+ #endif

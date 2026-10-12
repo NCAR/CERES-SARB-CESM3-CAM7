@@ -1,0 +1,23 @@
+diff --git a/src/physics/cam/CMakeLists.txt b/src/physics/cam/CMakeLists.txt
+index a11e6a3f..dd706528 100644
+--- a/src/physics/cam/CMakeLists.txt
++++ b/src/physics/cam/CMakeLists.txt
+@@ -1,5 +1,17 @@
+ # Append sources from this directory to the cam_sources list.
+-list(APPEND cam_sources micro_mg_data.F90 micro_mg_utils.F90
++list(APPEND cam_sources aod_nudging_kernel.F90
++  aod_nudging_optics.F90
++  aod_nudging_obs.F90
++  aod_nudging_intr.F90
++  aod_optics_kernel.F90
++  aod_optics_bands.F90
++  aod_optics_tap.F90
++  aod_optics_io.F90
++  aod_optics_lut_kernel.F90
++  aod_optics_lut_tables.F90
++  aod_optics_lut.F90
++  aod_optics_diag_intr.F90
++  micro_mg_data.F90 micro_mg_utils.F90
+   vdiff_lu_solver.F90)
+ 
+ sourcelist_to_parent(cam_sources)

@@ -1,0 +1,248 @@
+diff --git a/src/physics/cam/aerosol_optics_cam.F90 b/src/physics/cam/aerosol_optics_cam.F90
+index eab17968..aaadf9d9 100644
+--- a/src/physics/cam/aerosol_optics_cam.F90
++++ b/src/physics/cam/aerosol_optics_cam.F90
+@@ -50,6 +50,7 @@ module aerosol_optics_cam
+   public :: aerosol_optics_cam_final
+   public :: aerosol_optics_cam_sw
+   public :: aerosol_optics_cam_lw
++  public :: aerosol_optics_cam_lw_permode
+ 
+   type aero_props_t
+      class(aerosol_properties), pointer :: obj => null()
+@@ -582,4 +583,4 @@ contains
+-  subroutine aerosol_optics_cam_sw(list_idx, state, pbuf, nnite, idxnite, tauxar, wa, ga, fa)
++  subroutine aerosol_optics_cam_sw(list_idx, state, pbuf, nnite, idxnite, tauxar, wa, ga, fa, do_outfld)
+ 
+     ! calculates aerosol sw radiative properties
+ 
+@@ -594,6 +595,7 @@ contains
+     real(r8), intent(inout) :: wa(pcols,0:pver,nswbands)     ! layer single-scatter albedo
+     real(r8), intent(inout) :: ga(pcols,0:pver,nswbands)     ! asymmetry factor
+     real(r8), intent(inout) :: fa(pcols,0:pver,nswbands)     ! forward scattered fraction
++    logical, optional, intent(in) :: do_outfld
+ 
+     real(r8) :: taubam(pcols,0:pver)
+     character(len=*), parameter :: prefix = 'aerosol_optics_cam_sw: '
+@@ -604,6 +606,7 @@ contains
+     integer :: iwav, ilev
+     integer :: icol, istat
+     integer :: lchnk, ncol
++    logical :: emit_diagnostics
+ 
+     integer :: nmodes=0
+     character(len=aero_name_len) :: modetype
+@@ -724,6 +727,8 @@ contains
+ 
+     lchnk = state%lchnk
+     ncol  = state%ncol
++    emit_diagnostics = .true.
++    if (present(do_outfld)) emit_diagnostics = do_outfld
+ 
+     !REMOVECAM - no longer need this when CAM is retired and pcols no longer exists
+     troplev(:) = 0
+@@ -947,18 +952,18 @@ contains
+           deallocate(aero_optics)
+           nullify(aero_optics)
+ 
+-          if (aeroprops%model_is('BAM')) then
++          if (emit_diagnostics .and. aeroprops%model_is('BAM')) then
+              bam_cnt = bam_cnt+1
+              call aer_vis_diag_out(lchnk, ncol, nnite, idxnite, bam_cnt, taubam, &
+                   list_idx, troplev)
+           endif
+ 
+-          call output_bin_diags()
++          if (emit_diagnostics) call output_bin_diags()
+ 
+        end do binloop
+     end do aeromodel
+ 
+-    call output_tot_diags
++    if (emit_diagnostics) call output_tot_diags
+ 
+     deallocate(pext)
+     deallocate(pabs)
+@@ -1513,6 +1514,182 @@ contains
+ 
+   end subroutine aerosol_optics_cam_lw
+ 
++  !===============================================================================
++  subroutine aerosol_optics_cam_lw_permode(list_idx, state, pbuf, max_nbins, nbins_out, tauxar_bin)
++
++    ! Read-only SP3 tap: calculate per-bin aerosol LW absorption optical depth.
++    ! This is intentionally a local copy of aerosol_optics_cam_lw's bin loop so
++    ! the private aerosol optics state remains in scope and stock diagnostics are
++    ! not emitted.
++
++    integer,             intent(in)  :: list_idx
++    type(physics_state), intent(in), target :: state
++    type(physics_buffer_desc), pointer :: pbuf(:)
++    integer,             intent(in)  :: max_nbins
++    integer,             intent(out) :: nbins_out
++    real(r8), intent(out) :: tauxar_bin(pcols,pver,nlwbands,max_nbins)
++
++    real(r8) :: dopaer(pcols)
++    real(r8) :: mass(pcols,pver)
++
++    character(len=*), parameter :: prefix = 'aerosol_optics_cam_lw_permode: '
++
++    integer :: ibin, nbins
++    integer :: iwav, ilev
++    integer :: ncol, icol, istat
++    integer :: ig
++
++    type(aero_state_t), allocatable :: aero_state(:)
++
++    class(aerosol_optics), pointer :: aero_optics
++    class(aerosol_state),      pointer :: aerostate
++    class(aerosol_properties), pointer :: aeroprops
++
++    real(r8), allocatable :: pabs(:)
++
++    real(r8) :: relh(pcols,pver)
++    real(r8) :: sate(pcols,pver)
++    real(r8) :: satq(pcols,pver)
++    real(r8) :: sulfwtpct(pcols,pver)
++
++    character(len=32) :: opticstype
++    integer :: iaermod
++
++    real(r8), pointer :: geometric_radius(:,:)
++    integer  :: idx
++    character(len=16) :: pbuf_fld
++
++    tauxar_bin = 0._r8
++    nbins_out  = 0
++    ig         = 0
++
++    nullify(aero_optics)
++
++    allocate(aero_state(num_aero_models), stat=istat)
++    if (istat/=0) then
++       call endrun(prefix//'array allocation error: aero_state')
++    end if
++
++    iaermod = 0
++    if (modal_active) then
++       iaermod = iaermod+1
++       aero_state(iaermod)%obj => modal_aerosol_state( state, pbuf )
++    end if
++    if (carma_active) then
++       iaermod = iaermod+1
++       aero_state(iaermod)%obj => carma_aerosol_state( state, pbuf )
++    end if
++    if (bulk_active) then
++       iaermod = iaermod+1
++       aero_state(iaermod)%obj => bulk_aerosol_state( state, pbuf )
++    end if
++
++    ncol = state%ncol
++    mass(:ncol,:) = state%pdeldry(:ncol,:)*rga
++
++    allocate(pabs(ncol), stat=istat)
++    if (istat/=0) then
++       call endrun(prefix//'array allocation error: pabs')
++    end if
++
++    call qsat(state%t(:ncol,:), state%pmid(:ncol,:), sate(:ncol,:), satq(:ncol,:), ncol, pver)
++    relh(:ncol,:) = state%q(1:ncol,:,1) / satq(:ncol,:)
++    relh(:ncol,:) = max(1.e-20_r8, relh(:ncol,:))
++
++    aeromodel: do iaermod = 1,num_aero_models
++
++       aeroprops => aero_props(iaermod)%obj
++       aerostate => aero_state(iaermod)%obj
++
++       nbins=aero_props(iaermod)%obj%nbins(list_idx)
++
++       sulfwtpct(:ncol,:pver) = aerostate%wgtpct(ncol,pver)
++
++       binloop: do ibin = 1, nbins
++
++          ig = ig + 1
++          if (ig > max_nbins) call endrun(prefix//'max_nbins too small')
++
++          call aeroprops%optics_params(list_idx, ibin, opticstype=opticstype)
++
++          select case (trim(opticstype))
++          case('modal')
++             aero_optics=>refractive_aerosol_optics(aeroprops, aerostate, list_idx, ibin, &
++                                                    ncol, pver, nswbands, nlwbands, crefwsw, crefwlw)
++          case('hygroscopic_coreshell')
++             aero_optics=>hygrocoreshell_aerosol_optics(aeroprops, aerostate, list_idx, &
++                                                        ibin, ncol, pver, relh(:ncol,:))
++          case('hygroscopic_wtp')
++             aero_optics=>hygrowghtpct_aerosol_optics(aeroprops, aerostate, list_idx, &
++                                                      ibin, ncol, pver, sulfwtpct(:ncol,:))
++
++          case('hygroscopic')
++             aero_optics=>hygroscopic_aerosol_optics(aeroprops, aerostate, list_idx, ibin, &
++                                                     ncol, pver, numrh, relh(:ncol,:))
++
++          case('hygro')
++             aero_optics=>hygro_aerosol_optics(aeroprops, aerostate, list_idx, ibin, &
++                                                     ncol, pver, numrh, relh(:ncol,:))
++
++          case('nonhygro', 'insoluble')
++             aero_optics=>insoluble_aerosol_optics(aeroprops, aerostate, list_idx, ibin)
++
++          case('volcanic_radius','volcanic_radius1','volcanic_radius2','volcanic_radius3','volcanic_radius5')
++
++             pbuf_fld = 'VOLC_RAD_GEOM '
++             if (len_trim(opticstype)>15) then
++                pbuf_fld = trim(pbuf_fld)//opticstype(16:16)
++             endif
++
++             idx = pbuf_get_index(pbuf_fld)
++             call pbuf_get_field(pbuf, idx, geometric_radius)
++
++             aero_optics=>volcrad_aerosol_optics(aeroprops, aerostate, list_idx, &
++                  ibin, ncol, pver, geometric_radius(:ncol,:))
++
++          case default
++             call endrun(prefix//'optics method not recognized: '//trim(opticstype))
++          end select
++
++          if (associated(aero_optics)) then
++
++             wavelength: do iwav = 1, nlwbands
++
++                vertical: do ilev = 1, pver
++                   call aero_optics%lw_props(ncol, ilev, iwav, pabs )
++
++                   column: do icol = 1, ncol
++                      dopaer(icol) = pabs(icol) * mass(icol,ilev)
++                      tauxar_bin(icol,ilev,iwav,ig) = tauxar_bin(icol,ilev,iwav,ig) + dopaer(icol)
++                   end do column
++
++                end do vertical
++
++             end do wavelength
++
++          else
++             call endrun(prefix//'aero_optics object pointer not associated')
++          end if
++
++          deallocate(aero_optics)
++          nullify(aero_optics)
++
++       end do binloop
++    end do aeromodel
++
++    nbins_out = ig
++
++    deallocate(pabs)
++
++    do iaermod = 1,num_aero_models
++       deallocate(aero_state(iaermod)%obj)
++       nullify(aero_state(iaermod)%obj)
++    end do
++
++    deallocate(aero_state)
++
++  end subroutine aerosol_optics_cam_lw_permode
++
+   !===============================================================================
+   ! Private routines
+   !===============================================================================
