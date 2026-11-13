@@ -4213,6 +4213,7 @@
 
 <!-- AOD nudging defaults -->
 <aod_nudge_on>.false.</aod_nudge_on>
+<aod_tropo_only>.false.</aod_tropo_only>
 <aod_obs_template>MODIS_VIIRS_AOD_3hr_f09.%y%m%d.%s.nc</aod_obs_template>
 <aod_beg_ymd>101</aod_beg_ymd>
 <aod_end_ymd>99991231</aod_end_ymd>

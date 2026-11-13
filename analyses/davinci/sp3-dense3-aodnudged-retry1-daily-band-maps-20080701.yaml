@@ -1,0 +1,472 @@
+analysis:
+  start_time: "2008-07-01T00:00:00"
+  end_time: "2008-07-01T21:00:00"
+  output_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/sp3-dense3-aodnudged-retry1-daily-band-maps-20080701
+  domain: global
+  style:
+    theme: ncar
+    context: publication
+
+sources:
+  sw01_band_optics_files:
+    type: generic
+    display_name: SARB SW01 Aerosol Optics
+    files: /glade/derecho/scratch/fillmore/sp3v2_verify10_lut_aodnudged_camref_dense3_retry1_20260709/AER_MAM4_SW01.20080701.*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      column_extinction_source: &column_extinction_source
+        source_name: Extinction_Column_Optical_Depth
+        units: "1"
+        valid_min: 0.0
+      layer_scattering_source: &layer_scattering_source
+        source_name: Scattering_Layer_Optical_Depth
+        units: "1"
+        valid_min: 0.0
+      layer_asymmetry_source: &layer_asymmetry_source
+        source_name: Layer_Asymmetry_Parameter
+        units: "1"
+        valid_min: 0.0
+        valid_max: 1.0
+  sw05_band_optics_files:
+    type: generic
+    display_name: SARB SW05 Aerosol Optics
+    files: /glade/derecho/scratch/fillmore/sp3v2_verify10_lut_aodnudged_camref_dense3_retry1_20260709/AER_MAM4_SW05.20080701.*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      column_extinction_source: *column_extinction_source
+      layer_scattering_source: *layer_scattering_source
+      layer_asymmetry_source: *layer_asymmetry_source
+  sw10_band_optics_files:
+    type: generic
+    display_name: SARB SW10 Aerosol Optics
+    files: /glade/derecho/scratch/fillmore/sp3v2_verify10_lut_aodnudged_camref_dense3_retry1_20260709/AER_MAM4_SW10.20080701.*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      column_extinction_source: *column_extinction_source
+      layer_scattering_source: *layer_scattering_source
+      layer_asymmetry_source: *layer_asymmetry_source
+  sw14_band_optics_files:
+    type: generic
+    display_name: SARB SW14 Aerosol Optics
+    files: /glade/derecho/scratch/fillmore/sp3v2_verify10_lut_aodnudged_camref_dense3_retry1_20260709/AER_MAM4_SW14.20080701.*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      column_extinction_source: *column_extinction_source
+      layer_scattering_source: *layer_scattering_source
+      layer_asymmetry_source: *layer_asymmetry_source
+  lw01_band_optics_files:
+    type: generic
+    display_name: SARB LW01 Aerosol Optics
+    files: /glade/derecho/scratch/fillmore/sp3v2_verify10_lut_aodnudged_camref_dense3_retry1_20260709/AER_MAM4_LW01.20080701.*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      column_extinction_source: *column_extinction_source
+      layer_scattering_source: *layer_scattering_source
+      layer_asymmetry_source: *layer_asymmetry_source
+  lw06_band_optics_files:
+    type: generic
+    display_name: SARB LW06 Aerosol Optics
+    files: /glade/derecho/scratch/fillmore/sp3v2_verify10_lut_aodnudged_camref_dense3_retry1_20260709/AER_MAM4_LW06.20080701.*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      column_extinction_source: *column_extinction_source
+      layer_scattering_source: *layer_scattering_source
+      layer_asymmetry_source: *layer_asymmetry_source
+  lw12_band_optics_files:
+    type: generic
+    display_name: SARB LW12 Aerosol Optics
+    files: /glade/derecho/scratch/fillmore/sp3v2_verify10_lut_aodnudged_camref_dense3_retry1_20260709/AER_MAM4_LW12.20080701.*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      column_extinction_source: *column_extinction_source
+      layer_scattering_source: *layer_scattering_source
+      layer_asymmetry_source: *layer_asymmetry_source
+
+analyses:
+  sw01_band_optics:
+    type: gridded_analysis
+    source: sw01_band_optics_files
+    groupby: all
+    roles: &band_roles
+      column_extinction: column_extinction_source
+      layer_scattering: layer_scattering_source
+      layer_asymmetry: layer_asymmetry_source
+    fields:
+      column_extinction:
+        formula: 'mean(column_extinction, dim="time")'
+        units: "1"
+        long_name: Daily mean SW01 column aerosol optical depth
+        display_name: SW01 Column AOD
+        style_preset: geosit_aod
+      column_mean_asymmetry:
+        formula: &asymmetry_formula 'sum(mean(layer_asymmetry * layer_scattering, dim="time"), dim="z") / sum(mean(layer_scattering, dim="time"), dim="z")'
+        units: "1"
+        long_name: Daily mean SW01 scattering-weighted column asymmetry
+        display_name: SW01 Column Mean Asymmetry
+    output_group: sarb_band_optics
+  sw05_band_optics:
+    type: gridded_analysis
+    source: sw05_band_optics_files
+    groupby: all
+    roles: *band_roles
+    fields:
+      column_extinction:
+        formula: 'mean(column_extinction, dim="time")'
+        units: "1"
+        long_name: Daily mean SW05 column aerosol optical depth
+        display_name: SW05 Column AOD
+        style_preset: geosit_aod
+      column_mean_asymmetry:
+        formula: *asymmetry_formula
+        units: "1"
+        long_name: Daily mean SW05 scattering-weighted column asymmetry
+        display_name: SW05 Column Mean Asymmetry
+    output_group: sarb_band_optics
+  sw10_band_optics:
+    type: gridded_analysis
+    source: sw10_band_optics_files
+    groupby: all
+    roles: *band_roles
+    fields:
+      column_extinction:
+        formula: 'mean(column_extinction, dim="time")'
+        units: "1"
+        long_name: Daily mean SW10 column aerosol optical depth
+        display_name: SW10 Column AOD
+        style_preset: geosit_aod
+      column_mean_asymmetry:
+        formula: *asymmetry_formula
+        units: "1"
+        long_name: Daily mean SW10 scattering-weighted column asymmetry
+        display_name: SW10 Column Mean Asymmetry
+    output_group: sarb_band_optics
+  sw14_band_optics:
+    type: gridded_analysis
+    source: sw14_band_optics_files
+    groupby: all
+    roles: *band_roles
+    fields:
+      column_extinction:
+        formula: 'mean(column_extinction, dim="time")'
+        units: "1"
+        long_name: Daily mean SW14 column aerosol optical depth
+        display_name: SW14 Column AOD
+        style_preset: geosit_aod
+      column_mean_asymmetry:
+        formula: *asymmetry_formula
+        units: "1"
+        long_name: Daily mean SW14 scattering-weighted column asymmetry
+        display_name: SW14 Column Mean Asymmetry
+    output_group: sarb_band_optics
+  lw01_band_optics:
+    type: gridded_analysis
+    source: lw01_band_optics_files
+    groupby: all
+    roles: *band_roles
+    fields:
+      column_extinction:
+        formula: 'mean(column_extinction, dim="time")'
+        units: "1"
+        long_name: Daily mean LW01 column extinction optical depth
+        display_name: LW01 Column Extinction Optical Depth
+        style_preset: geosit_aod
+      column_mean_asymmetry:
+        formula: *asymmetry_formula
+        units: "1"
+        long_name: Daily mean LW01 scattering-weighted column asymmetry
+        display_name: LW01 Column Mean Asymmetry
+    output_group: sarb_band_optics
+  lw06_band_optics:
+    type: gridded_analysis
+    source: lw06_band_optics_files
+    groupby: all
+    roles: *band_roles
+    fields:
+      column_extinction:
+        formula: 'mean(column_extinction, dim="time")'
+        units: "1"
+        long_name: Daily mean LW06 column extinction optical depth
+        display_name: LW06 Column Extinction Optical Depth
+        style_preset: geosit_aod
+      column_mean_asymmetry:
+        formula: *asymmetry_formula
+        units: "1"
+        long_name: Daily mean LW06 scattering-weighted column asymmetry
+        display_name: LW06 Column Mean Asymmetry
+    output_group: sarb_band_optics
+  lw12_band_optics:
+    type: gridded_analysis
+    source: lw12_band_optics_files
+    groupby: all
+    roles: *band_roles
+    fields:
+      column_extinction:
+        formula: 'mean(column_extinction, dim="time")'
+        units: "1"
+        long_name: Daily mean LW12 column extinction optical depth
+        display_name: LW12 Column Extinction Optical Depth
+        style_preset: geosit_aod
+      column_mean_asymmetry:
+        formula: *asymmetry_formula
+        units: "1"
+        long_name: Daily mean LW12 scattering-weighted column asymmetry
+        display_name: LW12 Column Mean Asymmetry
+    output_group: sarb_band_optics
+
+plot_suites: {}
+
+plots:
+  sw01_column_aod:
+    type: spatial
+    source: sw01_band_optics
+    variable: column_extinction
+    title: SW01 Column AOD
+    output_subdir: plots/column-extinction
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    style_preset: geosit_aod
+  sw01_column_mean_asymmetry:
+    type: spatial
+    source: sw01_band_optics
+    variable: column_mean_asymmetry
+    title: SW01 Column Mean Asymmetry
+    output_subdir: plots/column-asymmetry
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    vmin: 0.0
+    vmax: 1.0
+  sw05_column_aod:
+    type: spatial
+    source: sw05_band_optics
+    variable: column_extinction
+    title: SW05 Column AOD
+    output_subdir: plots/column-extinction
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    style_preset: geosit_aod
+  sw05_column_mean_asymmetry:
+    type: spatial
+    source: sw05_band_optics
+    variable: column_mean_asymmetry
+    title: SW05 Column Mean Asymmetry
+    output_subdir: plots/column-asymmetry
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    vmin: 0.0
+    vmax: 1.0
+  sw10_column_aod:
+    type: spatial
+    source: sw10_band_optics
+    variable: column_extinction
+    title: SW10 Column AOD
+    output_subdir: plots/column-extinction
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    style_preset: geosit_aod
+  sw10_column_mean_asymmetry:
+    type: spatial
+    source: sw10_band_optics
+    variable: column_mean_asymmetry
+    title: SW10 Column Mean Asymmetry
+    output_subdir: plots/column-asymmetry
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    vmin: 0.0
+    vmax: 1.0
+  sw14_column_aod:
+    type: spatial
+    source: sw14_band_optics
+    variable: column_extinction
+    title: SW14 Column AOD
+    output_subdir: plots/column-extinction
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    style_preset: geosit_aod
+  sw14_column_mean_asymmetry:
+    type: spatial
+    source: sw14_band_optics
+    variable: column_mean_asymmetry
+    title: SW14 Column Mean Asymmetry
+    output_subdir: plots/column-asymmetry
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    vmin: 0.0
+    vmax: 1.0
+  lw01_column_extinction:
+    type: spatial
+    source: lw01_band_optics
+    variable: column_extinction
+    title: LW01 Column Extinction Optical Depth
+    output_subdir: plots/column-extinction
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    style_preset: geosit_aod
+  lw01_column_mean_asymmetry:
+    type: spatial
+    source: lw01_band_optics
+    variable: column_mean_asymmetry
+    title: LW01 Column Mean Asymmetry
+    output_subdir: plots/column-asymmetry
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    vmin: 0.0
+    vmax: 1.0
+  lw06_column_extinction:
+    type: spatial
+    source: lw06_band_optics
+    variable: column_extinction
+    title: LW06 Column Extinction Optical Depth
+    output_subdir: plots/column-extinction
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    style_preset: geosit_aod
+  lw06_column_mean_asymmetry:
+    type: spatial
+    source: lw06_band_optics
+    variable: column_mean_asymmetry
+    title: LW06 Column Mean Asymmetry
+    output_subdir: plots/column-asymmetry
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    vmin: 0.0
+    vmax: 1.0
+  lw12_column_extinction:
+    type: spatial
+    source: lw12_band_optics
+    variable: column_extinction
+    title: LW12 Column Extinction Optical Depth
+    output_subdir: plots/column-extinction
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    style_preset: geosit_aod
+  lw12_column_mean_asymmetry:
+    type: spatial
+    source: lw12_band_optics
+    variable: column_mean_asymmetry
+    title: LW12 Column Mean Asymmetry
+    output_subdir: plots/column-asymmetry
+    domain_type: [all]
+    formats: [pdf]
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: "-"
+    land_color: none
+    ocean_color: none
+    vmin: 0.0
+    vmax: 1.0
+
+pairs: {}
+
+inspection:
+  enabled: true
+  required: true
+  presets:
+    - sarb_band_aerosol_optics
+  preview_format: png

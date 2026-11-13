@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -N ceres-sarb-cam7_tropo_build
+#PBS -A P19010000
+#PBS -q develop
+#PBS -l select=1:ncpus=16:mem=64GB
+#PBS -l walltime=01:00:00
+#PBS -j oe
+set -euo pipefail
+cd /glade/work/fillmore/CERES-SARB-CAM7
+/glade/work/fillmore/miniforge3/envs/pace-daaq-py311/bin/python - <<'BUILD_PY'
+import importlib.util,json,subprocess
+from pathlib import Path
+repo=Path.cwd()
+spec=importlib.util.spec_from_file_location('setup',repo/'scripts/setup_tropospheric_july2008.py')
+setup=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(setup)
+plan=json.loads((repo/'config/tropospheric-july2008.json').read_text())
+if (Path(plan['exeroot'])/'cesm.exe').exists():
+    raise SystemExit('Refusing to rebuild the existing paired executable')
+subprocess.run(['./case.build'],cwd=plan['cases']['tropo']['path'],env=setup.clean_environment(plan),check=True)
+BUILD_PY

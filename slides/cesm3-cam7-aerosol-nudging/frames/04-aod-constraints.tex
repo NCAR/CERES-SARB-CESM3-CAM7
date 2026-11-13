@@ -1,0 +1,49 @@
+% 04-aod-constraints — "AOD Constraints". \section = \frametitle: each titled slide gets its own
+% section so the Berkeley sidebar lists the deck by slide title.
+% The column rescale in equations (SPEC.md D3-D7, §7): ratio clamped to
+% [0.1, 10], skipped below model AOD 0.01 or without an observation.
+\section{AOD Constraints}
+\begin{frame}[t]
+\frametitle{AOD Constraints}
+\footnotesize
+\begin{block}{Uniform Column Rescale at 550 nm}
+\vspace{-0.6em}
+\[
+  \tau_{\mathrm{m}} = \sum_{k}\sum_{m}
+      \sigma_{\mathrm{ext},m}\!\left(r_{\mathrm{wet}}, n_{\mathrm{wet}}\right) M_{m,k},
+  \qquad
+  r = \operatorname{clamp}\!\left(\tau_{\mathrm{obs}}/\tau_{\mathrm{m}},\, 0.1,\, 10\right)
+\]
+\vspace{-1.4em}
+\[
+  q_{s,k} \leftarrow r\, q_{s,k}, \qquad N_{m,k} \leftarrow r\, N_{m,k}
+\]
+{\scriptsize\raggedright
+$M_{m,k}$ aerosol mass per area of mode $m$ in layer $k$;
+$\sigma_{\mathrm{ext},m}$ its mass extinction cross section at wet radius $r_{\mathrm{wet}}$ and refractive index $n_{\mathrm{wet}}$;
+$\tau_{\mathrm{obs}}$ observed AOD;
+$q_{s,k}$ species mass and $N_{m,k}$ mode number mixing ratios, all species, modes and levels.
+$r = 1$ where $\tau_{\mathrm{m}} < 0.01$ or no observation.\par}
+\vspace{-0.3em}
+\end{block}
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}
+\begin{block}{Application}
+\begin{itemize}
+  \item Aerosol state replaced\\at each radiation step
+  \item Observations interpolated in time\\between the 3-hourly fields
+  \item Keeps speciation, size and shape;\\direct effect only
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.49\textwidth}
+\begin{block}{Diagnostics}
+\begin{itemize}
+  \item Observed, first-guess and\\analysed AOD each step
+  \item Increment $=$ analysed $-$ first guess
+  \item First guess carries earlier increments
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}

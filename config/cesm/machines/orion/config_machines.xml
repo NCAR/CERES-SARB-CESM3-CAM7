@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<config_machines version="2.0">
+  <machine MACH="orion">
+    <DESC>fillmore Pop!_OS desktop using a dedicated conda-forge GNU/OpenMPI toolchain</DESC>
+    <OS>LINUX</OS>
+    <PROXY/>
+    <COMPILERS>gnu</COMPILERS>
+    <MPILIBS>openmpi</MPILIBS>
+    <PROJECT>none</PROJECT>
+    <CIME_OUTPUT_ROOT>/home/fillmore/EarthSystem/CESM3/output</CIME_OUTPUT_ROOT>
+    <DIN_LOC_ROOT>/home/fillmore/EarthSystem/CESM3/inputdata</DIN_LOC_ROOT>
+    <DIN_LOC_ROOT_CLMFORC>$DIN_LOC_ROOT/atm/datm7</DIN_LOC_ROOT_CLMFORC>
+    <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
+    <BASELINE_ROOT>/home/fillmore/EarthSystem/CESM3/baselines</BASELINE_ROOT>
+    <CCSM_CPRNC/>
+    <GMAKE>/home/fillmore/miniforge3/envs/cesm3-build/bin/make</GMAKE>
+    <GMAKE_J>12</GMAKE_J>
+    <BATCH_SYSTEM>none</BATCH_SYSTEM>
+    <SUPPORTED_BY>fillmore</SUPPORTED_BY>
+    <MAX_TASKS_PER_NODE>16</MAX_TASKS_PER_NODE>
+    <MAX_MPITASKS_PER_NODE>16</MAX_MPITASKS_PER_NODE>
+    <PROJECT_REQUIRED>FALSE</PROJECT_REQUIRED>
+    <mpirun mpilib="openmpi">
+      <executable>/home/fillmore/miniforge3/envs/cesm3-build/bin/mpiexec</executable>
+      <arguments>
+        <arg name="ntasks"> -n {{ total_tasks }} </arg>
+      </arguments>
+    </mpirun>
+    <module_system type="none"/>
+    <environment_variables>
+      <env name="PATH">/home/fillmore/miniforge3/envs/cesm3-tools/bin:/home/fillmore/miniforge3/envs/cesm3-build/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin</env>
+      <env name="CONDA_PREFIX">/home/fillmore/miniforge3/envs/cesm3-build</env>
+      <env name="NETCDF_PATH">/home/fillmore/miniforge3/envs/cesm3-build</env>
+      <env name="NETCDF_C_PATH">/home/fillmore/miniforge3/envs/cesm3-build</env>
+      <env name="NETCDF_FORTRAN_PATH">/home/fillmore/miniforge3/envs/cesm3-build</env>
+      <env name="PNETCDF_PATH">/home/fillmore/miniforge3/envs/cesm3-build</env>
+      <env name="ESMFMKFILE">/home/fillmore/miniforge3/envs/cesm3-build/lib/esmf.mk</env>
+      <env name="PKG_CONFIG_PATH">/home/fillmore/miniforge3/envs/cesm3-build/lib/pkgconfig</env>
+      <env name="LD_LIBRARY_PATH">/home/fillmore/miniforge3/envs/cesm3-build/lib</env>
+      <env name="OMP_STACKSIZE">256M</env>
+      <env name="OMPI_MCA_pml">ob1</env>
+      <env name="OMPI_MCA_btl">self,sm</env>
+    </environment_variables>
+    <resource_limits>
+      <resource name="RLIMIT_STACK">-1</resource>
+    </resource_limits>
+  </machine>
+</config_machines>

@@ -1,0 +1,166 @@
+analysis:
+  start_time: "2008-07-01T00:00:00"
+  end_time: "2008-07-31T23:59:59"
+  output_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/cam-aod-monthly-analysis-july-2008
+  domain: global
+  style:
+    theme: ncar
+    context: publication
+
+sources:
+  cam_aod_analysis:
+    type: generic
+    display_name: CAM7 AOD Analysis
+    files: /glade/derecho/scratch/fillmore/sp2_200807_mam4_modis/run/sp2_200807_mam4_modis.cam.h0i.2008-07-*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      observed_aod_source:
+        source_name: AODNDG_OBS
+        units: "1"
+        valid_min: 0.0
+        valid_max: 5.0
+        nan_value: -999.0
+        display_name: MODIS Observed AOD
+        style_preset: geosit_aod
+      first_guess_aod_source:
+        source_name: AODNDG_MODEL_PRE
+        units: "1"
+        valid_min: 0.0
+        valid_max: 5.0
+        display_name: CAM7 First-Guess AOD
+        style_preset: geosit_aod
+      analyzed_aod_source:
+        source_name: AODNDG_MODEL_POST
+        units: "1"
+        valid_min: 0.0
+        valid_max: 5.0
+        display_name: CAM7 Analyzed AOD
+        style_preset: geosit_aod
+      nudge_mask:
+        source_name: AODNDG_MASK
+        units: "1"
+        valid_min: 0.0
+        valid_max: 1.0
+        display_name: AOD Nudge Mask
+
+analyses:
+  daily_aod:
+    type: gridded_analysis
+    source: cam_aod_analysis
+    groupby: day
+    roles:
+      observation: observed_aod_source
+      first_guess: first_guess_aod_source
+      analysis: analyzed_aod_source
+      mask: nudge_mask
+    fields:
+      observation_aod:
+        formula: 'active_mean(observation, mask > 0.5, dim="time")'
+        units: "1"
+        long_name: Daily mean MODIS AOD where CAM7 AOD nudging was active
+        display_name: MODIS Observed AOD
+        style_preset: geosit_aod
+      analyzed_aod:
+        formula: 'mean(analysis, dim="time")'
+        units: "1"
+        long_name: Daily mean CAM7 analyzed AOD
+        display_name: CAM7 Analyzed AOD
+        style_preset: geosit_aod
+      first_guess_aod:
+        formula: 'mean(first_guess, dim="time")'
+        units: "1"
+        long_name: Daily mean CAM7 first-guess AOD
+        display_name: CAM7 First-Guess AOD
+        style_preset: geosit_aod
+      analysis_minus_observation_aod:
+        formula: 'active_mean(analysis - observation, mask > 0.5, dim="time")'
+        units: "1"
+        long_name: Daily mean CAM7 analyzed AOD minus MODIS AOD where nudging was active
+        display_name: CAM7 Minus MODIS AOD
+      analysis_increment_aod:
+        formula: 'active_mean(analysis - first_guess, mask > 0.5, dim="time")'
+        units: "1"
+        long_name: Daily mean CAM7 AOD analysis increment where nudging was active
+        display_name: CAM7 AOD Analysis Increment
+      nudge_fraction:
+        formula: 'fraction(mask > 0.5, dim="time")'
+        units: "1"
+        long_name: Daily fraction of CAM7 records with active MODIS AOD nudging
+        display_name: MODIS Nudging Fraction
+    output_group: daily_cam_aod
+  monthly_aod:
+    type: gridded_analysis
+    source: cam_aod_analysis
+    groupby: all
+    roles:
+      observation: observed_aod_source
+      first_guess: first_guess_aod_source
+      analysis: analyzed_aod_source
+      mask: nudge_mask
+    fields:
+      observation_aod:
+        formula: 'active_mean(observation, mask > 0.5, dim="time")'
+        units: "1"
+        long_name: July monthly mean MODIS AOD where CAM7 AOD nudging was active
+        display_name: MODIS Observed AOD
+        style_preset: geosit_aod
+      analyzed_aod:
+        formula: 'mean(analysis, dim="time")'
+        units: "1"
+        long_name: July monthly mean CAM7 analyzed AOD
+        display_name: CAM7 Analyzed AOD
+        style_preset: geosit_aod
+      first_guess_aod:
+        formula: 'mean(first_guess, dim="time")'
+        units: "1"
+        long_name: July monthly mean CAM7 first-guess AOD
+        display_name: CAM7 First-Guess AOD
+        style_preset: geosit_aod
+      analysis_minus_observation_aod:
+        formula: 'active_mean(analysis - observation, mask > 0.5, dim="time")'
+        units: "1"
+        long_name: July monthly mean CAM7 analyzed AOD minus MODIS AOD where nudging was active
+        display_name: CAM7 Minus MODIS AOD
+      analysis_increment_aod:
+        formula: 'active_mean(analysis - first_guess, mask > 0.5, dim="time")'
+        units: "1"
+        long_name: July monthly mean CAM7 AOD analysis increment where nudging was active
+        display_name: CAM7 AOD Analysis Increment
+      nudge_fraction:
+        formula: 'fraction(mask > 0.5, dim="time")'
+        units: "1"
+        long_name: July monthly fraction of CAM7 records with active MODIS AOD nudging
+        display_name: MODIS Nudging Fraction
+    output_group: monthly_cam_aod
+
+plot_suites:
+  daily_aod:
+    preset: gridded_aod_diagnostics
+    source: daily_aod
+    group: daily
+    output_subdir: plots/daily-cam-aod
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+  monthly_aod:
+    preset: gridded_aod_diagnostics
+    source: monthly_aod
+    group: monthly
+    output_subdir: plots/monthly-cam-aod
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+
+plots: {}
+pairs: {}
+
+inspection:
+  enabled: true
+  required: true
+  presets:
+    - gridded_aod_diagnostics
+  preview_format: png

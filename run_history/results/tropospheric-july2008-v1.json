@@ -1,0 +1,82 @@
+{
+  "checked_utc": "2026-11-12T07:24:28.332202+00:00",
+  "passed": true,
+  "model": "cam7",
+  "comparison": {
+    "column_global_mean_AOD": 0.18910808013956049,
+    "tropospheric_global_mean_AOD": 0.18856361202805008,
+    "AOD_bias_tropospheric_minus_column": -0.0005444681115103814,
+    "AOD_spatial_RMSE": 0.006507024755408758,
+    "protected_layer_mass_increment_column": 3.4100372658940614e-06,
+    "protected_layer_mass_increment_tropospheric": 0.0,
+    "protected_layer_number_increment_column": 956994043904.0,
+    "protected_layer_number_increment_tropospheric": 0.0,
+    "interpretation": "Zero direct protected-layer increment does not require identical stratospheric profiles between trajectories: transport, physics, and a moving tropopause can create later differences."
+  },
+  "runs": {
+    "column": {
+      "passed": true,
+      "troposphere_only": false,
+      "run_dir": "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/tropospheric-july2008-v1/cam7_200807_modis_column_v1/run",
+      "history_records": 328,
+      "first_time": "2008-06-21 03:00:00",
+      "last_time": "2008-08-01 00:00:00",
+      "july_records": 248,
+      "july_first": "2008-07-01 00:00:00",
+      "july_last": "2008-07-31 21:00:00",
+      "counts": {
+        "active_cells": 2629911,
+        "cell_records": 13713408,
+        "low_clamps": 14002,
+        "high_clamps": 49,
+        "unclamped_cells": 2615860,
+        "protected_profile_cells": 195397460,
+        "changed_protected_mass_cells": 35902818
+      },
+      "maximum_errors": {
+        "ratio": 6.77444324637122e-07,
+        "total_AOD_update": 5.866601213710965e-07,
+        "fixed_AOD_change": 2.9569815397262573,
+        "protected_MMR_change": 3.4100372658940614e-06,
+        "protected_number_change": 956994043904.0,
+        "unclamped_observation": 4.76837158203125e-07
+      },
+      "global_mean_analyzed_AOD": 0.18910808013956049,
+      "profile_alignment": "Native model-level offset from diagnosed tropopause; zero is excluded, positive above, negative below.",
+      "sampling": "Three-hour instantaneous pre/post updates throughout July; direct increments are distinct from trajectory differences."
+    },
+    "tropo": {
+      "passed": true,
+      "troposphere_only": true,
+      "run_dir": "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/tropospheric-july2008-v1/cam7_200807_modis_tropo_v1/run",
+      "history_records": 328,
+      "first_time": "2008-06-21 03:00:00",
+      "last_time": "2008-08-01 00:00:00",
+      "july_records": 248,
+      "july_first": "2008-07-01 00:00:00",
+      "july_last": "2008-07-31 21:00:00",
+      "counts": {
+        "active_cells": 2597483,
+        "cell_records": 13713408,
+        "low_clamps": 19767,
+        "high_clamps": 137,
+        "unclamped_cells": 2577579,
+        "protected_profile_cells": 195393712,
+        "changed_protected_mass_cells": 0
+      },
+      "maximum_errors": {
+        "ratio": 7.85514249201924e-07,
+        "total_AOD_update": 7.888302206993103e-07,
+        "fixed_AOD_change": 0.0,
+        "protected_MMR_change": 0.0,
+        "protected_number_change": 0.0,
+        "unclamped_observation": 4.76837158203125e-07
+      },
+      "global_mean_analyzed_AOD": 0.18856361202805008,
+      "profile_alignment": "Native model-level offset from diagnosed tropopause; zero is excluded, positive above, negative below.",
+      "sampling": "Three-hour instantaneous pre/post updates throughout July; direct increments are distinct from trajectory differences."
+    }
+  },
+  "full_verification": "/glade/work/fillmore/Data/CERES-SARB-CAM7/analysis-inputs/tropospheric-july2008-v1/verification.json",
+  "accepted_pdf_manifest": "/glade/work/fillmore/Data/CERES-SARB-CAM7/plots/tropospheric-july2008-v1/manifest.json"
+}

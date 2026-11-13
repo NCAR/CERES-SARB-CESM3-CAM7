@@ -1,0 +1,294 @@
+analysis:
+  start_time: "2008-01-01T00:00:00"
+  end_time: "2008-12-31T23:59:59"
+  output_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites
+  log_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites/logs
+  domain: global
+  style:
+    theme: ncar
+    context: publication
+
+# These compact inputs are prepared from the twelve completed monthly DAVINCI
+# products by scripts/prepare_2008_optics_composites.py. Seasonal and annual
+# means are calendar-day weighted. DJF combines January, February, and December
+# 2008 for this within-calendar-year summary. SSA is extinction-weighted and
+# asymmetry is scattering-weighted rather than averaged directly.
+sources:
+  ultraviolet_optics:
+    type: generic
+    display_name: 2008 ERA5- and MODIS-Nudged CAM7 Ultraviolet Aerosol Optics
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites/products/ultraviolet_optics/analysis.nc
+    variables: &shortwave_product_variables
+      column_aod:
+        source_name: column_aod
+        units: "1"
+        display_name: Column Aerosol Optical Depth
+        style_preset: geosit_aod
+      single_scatter_albedo:
+        source_name: single_scatter_albedo
+        units: "1"
+        display_name: Single-Scatter Albedo
+      asymmetry:
+        source_name: asymmetry
+        units: "1"
+        display_name: Asymmetry Parameter
+  visible_optics:
+    type: generic
+    display_name: 2008 ERA5- and MODIS-Nudged CAM7 Visible Aerosol Optics
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites/products/visible_optics/analysis.nc
+    variables: *shortwave_product_variables
+  near_infrared_optics:
+    type: generic
+    display_name: 2008 ERA5- and MODIS-Nudged CAM7 Near-Infrared Aerosol Optics
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites/products/near_infrared_optics/analysis.nc
+    variables: *shortwave_product_variables
+  shortwave_infrared_optics:
+    type: generic
+    display_name: 2008 ERA5- and MODIS-Nudged CAM7 Shortwave-Infrared Aerosol Optics
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites/products/shortwave_infrared_optics/analysis.nc
+    variables: *shortwave_product_variables
+  water_vapor_optics:
+    type: generic
+    display_name: 2008 ERA5- and MODIS-Nudged CAM7 Water Vapor Band Aerosol Optics
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites/products/water_vapor_optics/analysis.nc
+    variables: &longwave_product_variables
+      column_scattering:
+        source_name: column_scattering
+        units: "1"
+        display_name: Column Scattering Optical Depth
+      column_extinction:
+        source_name: column_extinction
+        units: "1"
+        display_name: Column Extinction Optical Depth
+        style_preset: geosit_aod
+      asymmetry:
+        source_name: asymmetry
+        units: "1"
+        display_name: Asymmetry Parameter
+  ozone_optics:
+    type: generic
+    display_name: 2008 ERA5- and MODIS-Nudged CAM7 Ozone Band Aerosol Optics
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites/products/ozone_optics/analysis.nc
+    variables: *longwave_product_variables
+  atmospheric_window_optics:
+    type: generic
+    display_name: 2008 ERA5- and MODIS-Nudged CAM7 Atmospheric Window Aerosol Optics
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites/products/atmospheric_window_optics/analysis.nc
+    variables: *longwave_product_variables
+  carbon_dioxide_optics:
+    type: generic
+    display_name: 2008 ERA5- and MODIS-Nudged CAM7 Carbon Dioxide Band Aerosol Optics
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-composites/products/carbon_dioxide_optics/analysis.nc
+    variables: *longwave_product_variables
+
+plot_suites:
+  ultraviolet_optics:
+    preset: sarb_band_aerosol_optics
+    source: ultraviolet_optics
+    output_subdir: plots/shortwave/ultraviolet
+    fields:
+      ultraviolet_column_aod: column_aod
+      ultraviolet_single_scatter_albedo: single_scatter_albedo
+      ultraviolet_asymmetry: asymmetry
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+      show_coastlines: true
+      show_countries: false
+      show_states: false
+      show_gridlines: true
+      gridline_style: "-"
+      land_color: none
+      ocean_color: none
+      ultraviolet_column_aod:
+        title: Ultraviolet Aerosol Optical Depth (0.340 µm)
+      ultraviolet_single_scatter_albedo:
+        title: Ultraviolet Single-Scatter Albedo (0.340 µm)
+      ultraviolet_asymmetry:
+        title: Ultraviolet Asymmetry Parameter (0.340 µm)
+  visible_optics:
+    preset: sarb_band_aerosol_optics
+    source: visible_optics
+    output_subdir: plots/shortwave/visible
+    fields:
+      visible_column_aod: column_aod
+      visible_single_scatter_albedo: single_scatter_albedo
+      visible_asymmetry: asymmetry
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+      show_coastlines: true
+      show_countries: false
+      show_states: false
+      show_gridlines: true
+      gridline_style: "-"
+      land_color: none
+      ocean_color: none
+      visible_column_aod:
+        title: Visible Aerosol Optical Depth (0.546 µm)
+      visible_single_scatter_albedo:
+        title: Visible Single-Scatter Albedo (0.546 µm)
+      visible_asymmetry:
+        title: Visible Asymmetry Parameter (0.546 µm)
+  near_infrared_optics:
+    preset: sarb_band_aerosol_optics
+    source: near_infrared_optics
+    output_subdir: plots/shortwave/near-infrared
+    fields:
+      near_infrared_column_aod: column_aod
+      near_infrared_single_scatter_albedo: single_scatter_albedo
+      near_infrared_asymmetry: asymmetry
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+      show_coastlines: true
+      show_countries: false
+      show_states: false
+      show_gridlines: true
+      gridline_style: "-"
+      land_color: none
+      ocean_color: none
+      near_infrared_column_aod:
+        title: Near-Infrared Aerosol Optical Depth (0.842 µm)
+      near_infrared_single_scatter_albedo:
+        title: Near-Infrared Single-Scatter Albedo (0.842 µm)
+      near_infrared_asymmetry:
+        title: Near-Infrared Asymmetry Parameter (0.842 µm)
+  shortwave_infrared_optics:
+    preset: sarb_band_aerosol_optics
+    source: shortwave_infrared_optics
+    output_subdir: plots/shortwave/shortwave-infrared
+    fields:
+      shortwave_infrared_column_aod: column_aod
+      shortwave_infrared_single_scatter_albedo: single_scatter_albedo
+      shortwave_infrared_asymmetry: asymmetry
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+      show_coastlines: true
+      show_countries: false
+      show_states: false
+      show_gridlines: true
+      gridline_style: "-"
+      land_color: none
+      ocean_color: none
+      shortwave_infrared_column_aod:
+        title: Shortwave-Infrared Aerosol Optical Depth (1.66 µm)
+      shortwave_infrared_single_scatter_albedo:
+        title: Shortwave-Infrared Single-Scatter Albedo (1.66 µm)
+      shortwave_infrared_asymmetry:
+        title: Shortwave-Infrared Asymmetry Parameter (1.66 µm)
+  water_vapor_optics:
+    preset: sarb_band_aerosol_optics
+    source: water_vapor_optics
+    output_subdir: plots/longwave/water-vapor
+    fields:
+      water_vapor_scattering_optical_depth: column_scattering
+      water_vapor_extinction_optical_depth: column_extinction
+      water_vapor_asymmetry: asymmetry
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+      show_coastlines: true
+      show_countries: false
+      show_states: false
+      show_gridlines: true
+      gridline_style: "-"
+      land_color: none
+      ocean_color: none
+      water_vapor_scattering_optical_depth:
+        title: Water Vapor Band Scattering Optical Depth (6.51 µm)
+      water_vapor_extinction_optical_depth:
+        title: Water Vapor Band Extinction Optical Depth (6.51 µm)
+      water_vapor_asymmetry:
+        title: Water Vapor Band Asymmetry Parameter (6.51 µm)
+  ozone_optics:
+    preset: sarb_band_aerosol_optics
+    source: ozone_optics
+    output_subdir: plots/longwave/ozone
+    fields:
+      ozone_scattering_optical_depth: column_scattering
+      ozone_extinction_optical_depth: column_extinction
+      ozone_asymmetry: asymmetry
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+      show_coastlines: true
+      show_countries: false
+      show_states: false
+      show_gridlines: true
+      gridline_style: "-"
+      land_color: none
+      ocean_color: none
+      ozone_scattering_optical_depth:
+        title: Ozone Band Scattering Optical Depth (9.64 µm)
+      ozone_extinction_optical_depth:
+        title: Ozone Band Extinction Optical Depth (9.64 µm)
+      ozone_asymmetry:
+        title: Ozone Band Asymmetry Parameter (9.64 µm)
+  atmospheric_window_optics:
+    preset: sarb_band_aerosol_optics
+    source: atmospheric_window_optics
+    output_subdir: plots/longwave/atmospheric-window
+    fields:
+      atmospheric_window_scattering_optical_depth: column_scattering
+      atmospheric_window_extinction_optical_depth: column_extinction
+      atmospheric_window_asymmetry: asymmetry
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+      show_coastlines: true
+      show_countries: false
+      show_states: false
+      show_gridlines: true
+      gridline_style: "-"
+      land_color: none
+      ocean_color: none
+      atmospheric_window_scattering_optical_depth:
+        title: Atmospheric Window Scattering Optical Depth (11.35 µm)
+      atmospheric_window_extinction_optical_depth:
+        title: Atmospheric Window Extinction Optical Depth (11.35 µm)
+      atmospheric_window_asymmetry:
+        title: Atmospheric Window Asymmetry Parameter (11.35 µm)
+  carbon_dioxide_optics:
+    preset: sarb_band_aerosol_optics
+    source: carbon_dioxide_optics
+    output_subdir: plots/longwave/carbon-dioxide
+    fields:
+      carbon_dioxide_scattering_optical_depth: column_scattering
+      carbon_dioxide_extinction_optical_depth: column_extinction
+      carbon_dioxide_asymmetry: asymmetry
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+      show_coastlines: true
+      show_countries: false
+      show_states: false
+      show_gridlines: true
+      gridline_style: "-"
+      land_color: none
+      ocean_color: none
+      carbon_dioxide_scattering_optical_depth:
+        title: Carbon Dioxide Band Scattering Optical Depth (16.7 µm)
+      carbon_dioxide_extinction_optical_depth:
+        title: Carbon Dioxide Band Extinction Optical Depth (16.7 µm)
+      carbon_dioxide_asymmetry:
+        title: Carbon Dioxide Band Asymmetry Parameter (16.7 µm)
+
+plots: {}
+pairs: {}
+
+inspection:
+  enabled: true
+  required: true
+  presets:
+    - sarb_band_aerosol_optics
+  preview_format: png

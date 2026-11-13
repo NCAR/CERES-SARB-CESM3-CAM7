@@ -23,6 +23,7 @@
 *.dll
 *.so.*
 
+
 # Fortran module files
 *.mod
 *.smod
@@ -38,10 +39,10 @@
 *.out
 *.app
 
-# Build directories
-build/
-Build/
-build-*/
+# Build directories (anchored to repo root so they don't match e.g. .claude/skills/build-*)
+/build/
+/Build/
+/build-*/
 
 # CMake generated files
 CMakeFiles/
@@ -66,3 +67,7 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Python bytecode
+__pycache__/
+*.pyc

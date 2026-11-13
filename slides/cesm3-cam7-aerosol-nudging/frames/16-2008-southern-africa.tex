@@ -1,0 +1,30 @@
+% 16-2008-southern-africa — 2008 Test Run, Southern Africa (smoke): daily regional-mean SW AOD
+% (four bands) and LW optical depth (four bands) on the top row, CAM7 vs
+% AERONET daily AOD in the visible (546 vs 500 nm) and near-infrared
+% (842 vs 870 nm) on the bottom row. Slides 13-24 are grouped by dominant
+% aerosol type (dust, smoke, pollution, ocean outflow) and within each type
+% by decreasing AERONET 500 nm annual mean (analyses/statistics/.../README.md).
+% Sources: DAVINCI regional-aod and regional-aeronet analyses
+% (analyses/davinci/), copied under graphics/2008-regional/.
+% All four plots are 656x296pt with ~7pt margins: no trim; \regpanel
+% (preamble.tex) sets each at 0.48 of the column width, ~2.7cm tall, so
+% two rows fit under \bodyheight.
+\begin{frame}[t]
+\frametitle{2008 Southern Africa}
+\centering
+\regpanel{2008-regional/southern-africa/southern_africa_shortwave_aod.pdf}\hfill
+\regpanel{2008-regional/southern-africa/southern_africa_longwave_optical_depth.pdf}\par
+\vspace{0.15cm}
+\regpanel{2008-regional/southern-africa/southern_africa_aeronet_visible.pdf}\hfill
+\regpanel{2008-regional/southern-africa/southern_africa_aeronet_near_infrared.pdf}\par
+\vspace{0.1cm}
+{\tiny\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+CAM7 vs AERONET & Days & AERONET & CAM7 & Bias & Mean error & RMSE & R \\
+\midrule
+Visible (546 vs 500 nm) & 322 & 0.267 & 0.173 & $-0.094$ & 0.107 & 0.157 & 0.90 \\
+Near-infrared (842 vs 870 nm) & 199 & 0.104 & 0.064 & $-0.041$ & 0.043 & 0.058 & 0.77 \\
+\bottomrule
+\end{tabular}\par}
+\end{frame}

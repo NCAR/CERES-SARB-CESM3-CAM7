@@ -1,0 +1,142 @@
+schema_version: 1
+run_id: cam7_200807_modis_column_v1--20261111
+case_name: cam7_200807_modis_column_v1
+run_kind: cesm
+execution_date: '2026-11-11'
+purpose: Matched whole-column versus tropospheric-only MODIS scaling, ten June spinup days and July 2008 profiles
+simulation:
+  calendar: NO_LEAP
+  start_date: '2008-06-21'
+  end_date: '2008-08-01'
+  spinup_days: 10
+  duration_days: 41
+  analysis_records: 248
+  history_cadence_hours: 3
+configuration:
+  model: CAM7
+  compset: HIST_CAM70_CLM60%SP_CICE%PRES_DOCN%DOM_MOSART_SGLC_SWAV_SESP
+  resolution: f09_f09_mg17
+  aerosol: MAM4
+  aod_tropo_only: false
+  case_plan: config/tropospheric-july2008.json
+  case_provenance: /glade/work/fillmore/CESM3/cases/cam7_200807_modis_column_v1/tropospheric-experiment.json
+  executable_sha256: 8511fdab17a74ec97a9e4ec3db60c8bffb76a88334001e726b9b0d68e4d500c9
+  cesm_commit: 8ce857e8ba55bf7aeca11d93562e36abd635e5a0
+  cam_commit: da38e55454ee870107addf6a157c0d67bc2f7978
+  kernel_sha256: ae8e9f896c8f0b72919d93df9ce512d465b55a75a959fe795071b37365d236cd
+scheduler:
+  system: Derecho PBS
+  job_id: 8160952.desched1
+  scheduler_state: F
+  tasks: 128
+  threads: 1
+  walltime_requested: 03:00:00
+  memory_requested: 128GB
+  build_job_id: 8160848.desched1
+  build_exit_status: 0
+  submission_queue: develop
+  queue_change: /glade/work/fillmore/Data/CERES-SARB-CAM7/logs/tropospheric-july2008-v1/queue-change.json
+  queue_change_evidence: /glade/work/fillmore/Data/CERES-SARB-CAM7/logs/tropospheric-july2008-v1/queue-change.json
+  exit_status: 0
+  walltime_used: 01:40:02
+  maximum_memory_used: 93329092kb
+  execution_queue: cpudev
+  started_local: Wed Nov 11 22:34:36 2026
+status:
+  stage: scientifically-accepted
+  model_outcome: succeeded
+  summary: Full 41-day integration, all July paired numerical gates, complete DAVINCI pipeline, and visual review
+    passed. Ten PDFs accepted for this July scaling comparison.
+outputs:
+  primary: /glade/work/fillmore/Data/CERES-SARB-CAM7/model-output/tropospheric-july2008-v1/cam7_200807_modis_column_v1
+  case_dir: /glade/work/fillmore/CESM3/cases/cam7_200807_modis_column_v1
+  run_dir: /glade/derecho/scratch/fillmore/CERES-SARB-CAM7/tropospheric-july2008-v1/cam7_200807_modis_column_v1/run
+  history_archive_manifest: /glade/work/fillmore/Data/CERES-SARB-CAM7/model-output/tropospheric-july2008-v1/cam7_200807_modis_column_v1/manifest.json
+  davinci: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/tropospheric-july2008-v1
+  accepted_plots: /glade/work/fillmore/Data/CERES-SARB-CAM7/plots/tropospheric-july2008-v1
+  verification_summary: run_history/results/tropospheric-july2008-v1.json
+validation:
+  structural:
+    status: passed
+    summary: PBS exit zero and CIME model/case success; 41 history files, 328 continuous three-hour samples from
+      2008-06-21 03:00:00 through 2008-08-01 00:00:00, and exactly 248 July samples.
+    history_records: 328
+    july_records: 248
+    evidence: /glade/work/fillmore/Data/CERES-SARB-CAM7/analysis-inputs/tropospheric-july2008-v1/verification.json
+  numeric:
+    status: passed
+    summary: All 248 archived July samples pass guards, ratio clamps, optical partition, total analyzed AOD, inactive-column,
+      and mass/number scaling checks. Tropospheric mode has exactly zero increment in every protected profile cell.
+    evidence: /glade/work/fillmore/Data/CERES-SARB-CAM7/analysis-inputs/tropospheric-july2008-v1/verification.json
+    counts:
+      active_cells: 2629911
+      cell_records: 13713408
+      low_clamps: 14002
+      high_clamps: 49
+      unclamped_cells: 2615860
+      protected_profile_cells: 195397460
+      changed_protected_mass_cells: 35902818
+    maximum_errors:
+      ratio: 6.77444324637122e-07
+      total_AOD_update: 5.866601213710965e-07
+      fixed_AOD_change: 2.9569815397262573
+      protected_MMR_change: 3.4100372658940614e-06
+      protected_number_change: 956994043904.0
+      unclamped_observation: 4.76837158203125e-07
+    compiled_tests: 'CAM6: 10 tests; CAM7: 45 focused deployment, compiled adapter, numerical gate, and plotting-policy
+      tests; both native model builds succeeded.'
+    test_log: /glade/work/fillmore/Data/CERES-SARB-CAM7/logs/tropospheric-july2008-v1/tests-final.log
+    comparison: run_history/results/tropospheric-july2008-cross-model.json
+    cross_model_comparison_job:
+      job_id: 8161449.desched1
+      exit_status: 0
+  davinci:
+    status: passed
+    summary: Complete PBS DAVINCI run; two NetCDF products, ten PDFs and ten previews; artifact audit and automated
+      inspection passed.
+    job_id: 8160953.desched1
+    postprocess_job_id: 8160953.desched1
+    config: analyses/davinci/tropospheric-july2008-v1.yaml
+    manifest: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/tropospheric-july2008-v1/manifest.json
+    inspection: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/tropospheric-july2008-v1/inspection/inspection.json
+    audit: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/tropospheric-july2008-v1/audit.json
+  science:
+    status: passed
+    summary: All ten previews reviewed. Whole-column and tropospheric AOD maps retain corresponding dust, smoke,
+      and pollution maxima and low remote Southern Hemisphere ocean AOD. Differences are small globally and mainly
+      in northern high latitudes. New mass and number increment profiles lie exactly at zero at and above the excluded
+      tropopause level; whole-column profiles show increments aloft. Analyzed mass aloft is lower in the tropospheric
+      trajectory. Titles, units, July dates, and native-level orientation are readable.
+    scope: July 2008 matched whole-column versus tropospheric aerosol-scaling smoke test
+    visual_review: /glade/work/fillmore/Data/CERES-SARB-CAM7/provenance/tropospheric-july2008-v1/visual-review.json
+    accepted_pdf_manifest: /glade/work/fillmore/Data/CERES-SARB-CAM7/plots/tropospheric-july2008-v1/manifest.json
+    limitations:
+    - Exactly zero refers to direct pre/post analysis increments in the protected atmosphere; transport, physics,
+      and a moving tropopause can change evolving profiles.
+    - Within-model pairs isolate the scaling option; cross-model comparisons also include different physics, meteorology,
+      forcing, and initialization.
+    - Acceptance covers this July smoke test and does not establish long-term climatological skill.
+provenance:
+  recorded_at: '2026-11-12T07:29:16.493565+00:00'
+  sources:
+  - config/tropospheric-july2008.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/logs/tropospheric-july2008-v1/submit-column.log
+  - /glade/work/fillmore/CESM3/cases/cam7_200807_modis_column_v1/tropospheric-experiment.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/logs/tropospheric-july2008-v1/queue-change.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/logs/tropospheric-july2008-v1/era5-coverage.json
+  - /glade/work/fillmore/CESM3/cases/cam7_200807_modis_column_v1/CaseStatus
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/provenance/tropospheric-july2008-v1/pbs-closeout.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/model-output/tropospheric-july2008-v1/cam7_200807_modis_column_v1/manifest.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/analysis-inputs/tropospheric-july2008-v1/verification.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/provenance/tropospheric-july2008-v1/visual-review.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM6/analysis-inputs/tropospheric-july2008-v1/cross-model-comparison.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM6/logs/tropospheric-july2008-v1/cross-model-job.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/provenance/tropospheric-july2008-v1/final-source-check.json
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/logs/tropospheric-july2008-v1/era5-coverage.json
+results:
+- Ten June spinup days followed by 248 July three-hourly instantaneous analysis samples.
+- 'July area-weighted analyzed AOD: 0.1891080801; aod_tropo_only=False.'
+- 'Maximum direct protected-layer mass increment: 3.41003726589e-06 kg/kg; number: 956994043904 kg^-1.'
+- Native CAM TWMO with climatology fallback; only levels strictly below the diagnosed tropopause level are eligible.
+- One executable and identical forcing/initialization per model pair; the option is the sole scientific namelist
+  difference.

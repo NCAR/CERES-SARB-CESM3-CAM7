@@ -1,0 +1,45 @@
+MONTHLY TECHNICAL PROGRESS REPORT
+NASA LARC RSES CONTRACT 80LARC23DA003
+
+Company Name: UCAR
+WBS Number: 14.00163
+For the Month of: {{MONTH_YEAR}}
+TDN/ Sub-TDN Title: CERES Support - SARB
+
+Performance Summary:
+{{PERFORMANCE_SUMMARY}}
+
+Major/Significant Accomplishments:
+{{ACCOMPLISHMENTS}}
+
+Deliverables:
+{{DELIVERABLES}}
+
+Schedule Performance:
+{{SCHEDULE_PERFORMANCE}}
+
+Cost Savings - Quantifiable Data:
+{{COST_SAVINGS}}
+
+Issues/Problems/Concerns and Proposed Solutions:
+{{ISSUES}}
+
+Potential Risks
+{{RISKS}}
+
+Work Planned:
+{{WORK_PLANNED}}
+
+Recognition:
+{{RECOGNITION}}
+
+Invention Disclosure Reporting:
+Was an Invention Disclosure reported to the NASA Technical Reporting System?
+[ ] Yes  [X] No
+
+If yes, please provide:
+Title:
+Case Number:
+
+Monthly Manpower Utilization and Material Expenditures:
+Detailed information is available in the financial section of iSite.

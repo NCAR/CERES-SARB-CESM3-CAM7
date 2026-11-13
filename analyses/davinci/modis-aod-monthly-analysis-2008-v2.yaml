@@ -1,0 +1,67 @@
+analysis:
+  start_time: "2008-01-01T00:00:00"
+  end_time: "2008-12-31T23:59:59"
+  output_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/modis-aod-monthly-analysis-2008-v2
+  domain: global
+  style:
+    theme: ncar
+    context: publication
+
+sources:
+  modis_gridded_aod:
+    type: generic
+    display_name: MODIS Gridded AOD
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/AOD_f09_3hr_2008_v2/MODIS_VIIRS_AOD_3hr_f09.2008*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      aod_weighted_mean:
+        units: "1"
+        valid_min: 0.0
+        valid_max: 5.0
+        nan_value: -999.0
+        display_name: MODIS AOD
+        style_preset: geosit_aod
+      aod_count:
+        units: "1"
+        valid_min: 0.0
+        display_name: Observation Count
+
+analyses:
+  monthly_aod:
+    type: gridded_analysis
+    source: modis_gridded_aod
+    groupby: month
+    roles:
+      observation: aod_weighted_mean
+      count: aod_count
+    fields:
+      observation_aod:
+        formula: 'weighted_mean(observation, count, dim="time")'
+        units: "1"
+        long_name: Monthly count-weighted MODIS AOD at 550 nm
+        display_name: MODIS AOD
+        style_preset: geosit_aod
+    output_group: monthly_modis_aod
+
+plot_suites:
+  monthly_aod:
+    preset: gridded_aod_diagnostics
+    source: monthly_aod
+    group: monthly
+    output_subdir: plots/monthly-modis-aod
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+
+plots: {}
+pairs: {}
+
+inspection:
+  enabled: true
+  required: true
+  presets:
+    - gridded_aod_diagnostics
+  preview_format: png

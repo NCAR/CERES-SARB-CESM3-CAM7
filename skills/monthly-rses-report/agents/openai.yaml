@@ -1,0 +1,4 @@
+interface:
+  display_name: "RSES Monthly Report"
+  short_description: "Draft the monthly NASA LaRC RSES technical progress report"
+  default_prompt: "Use $monthly-rses-report to draft last month's RSES progress report from repo activity and place it on the Desktop."

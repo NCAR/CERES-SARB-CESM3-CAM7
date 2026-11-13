@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N ceres-sarb-cam7_tropo_plots
+#PBS -A P19010000
+#PBS -q develop
+#PBS -l select=1:ncpus=4:mem=32GB
+#PBS -l walltime=01:00:00
+#PBS -j oe
+set -euo pipefail
+export PYTHONPATH=/glade/work/fillmore/DAVINCI:/glade/work/fillmore/CERES-SARB-CAM7
+export MPLBACKEND=Agg OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+cd /glade/work/fillmore/CERES-SARB-CAM7
+/glade/work/fillmore/miniforge3/envs/davinci/bin/python scripts/postprocess_tropospheric_july2008.py

@@ -1,0 +1,36 @@
+% NASA theme seam — palette, logo binding, graphics path.
+% After CERES-MIP/slides/colors.tex, but the whole deck is NASA: the seam
+% below binds every slide's chrome to NASA blue (what \nasaslide did for a
+% single frame in Media/decks/agentic_ai). NCAR inks stay defined for use
+% inside diagrams (model-side boxes) only.
+
+% --- NASA palette --------------------------------------------------------
+\definecolor{nasaBlue}{HTML}{0B3D91}
+\definecolor{nasaRed}{HTML}{FC3D21}
+
+% --- NSF NCAR brand palette (diagram inks only; not deck chrome) ---------
+\definecolor{ncarSpace}{HTML}{011837}
+\definecolor{ncarDarkBlue}{HTML}{00357A}
+\definecolor{ncarBlue}{HTML}{0A5DDA}
+\definecolor{ncarAqua}{HTML}{00A2B4}
+\definecolor{ncarLightBlue}{HTML}{CEDFF8}
+\definecolor{ncarLightGray}{HTML}{F1F0EE}
+\definecolor{ncarOrange}{HTML}{FF8C00}
+\definecolor{ncarYellow}{HTML}{FFDD31}
+
+% --- Symbolic seam: slide patterns use ONLY these (portability contract) ---
+\colorlet{accent}{nasaBlue}            % structure, frametitle, bullets
+\colorlet{accentSoft}{nasaBlue!40!white}% secondary tier
+\colorlet{accentDeep}{nasaBlue!60!black}% deep tier
+\colorlet{sidebarBg}{nasaBlue!35!black} % Berkeley sidebar ground
+\colorlet{bannerBg}{nasaBlue}           % headline banner boxes
+
+% --- Logo binding (bare filename; resolved via \graphicspath below) ---
+\newcommand{\themelogo}{nasa_logo.pdf}
+
+% --- Font binding ---
+% helvet: Poppins is not shipped with Tectonic.
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\graphicspath{{graphics/}}

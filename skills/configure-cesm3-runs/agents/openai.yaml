@@ -1,0 +1,4 @@
+interface:
+  display_name: "CESM3 Configure Runs"
+  short_description: "Query CESM3 metadata and configure CIME cases"
+  default_prompt: "Use $configure-cesm3-runs to query the live checkout, verify its provenance, and prepare a validated CIME case configuration."

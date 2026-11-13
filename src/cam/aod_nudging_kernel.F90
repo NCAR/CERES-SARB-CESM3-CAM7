@@ -14,11 +14,45 @@ module aod_nudging_kernel
   public :: compute_ratio
   public :: interp_weight
   public :: combine_snapshots
+  public :: compute_tropospheric_ratio, below_tropopause, scale_profile
 
   ! Contract fill value: "no valid obs here" -> leave model untouched.
   real(r8), parameter, public :: AOD_FILL = -999._r8
 
 contains
+
+  elemental function compute_tropospheric_ratio(target, total, trop, valid, eps, rmin, rmax) result(ratio)
+    ! The excluded atmosphere stays fixed. Only the eligible optical depth can
+    ! satisfy the residual column target; targets below the fixed AOD clamp low.
+    real(r8), intent(in) :: target, total, trop, eps, rmin, rmax
+    logical, intent(in) :: valid
+    real(r8) :: ratio, fixed
+    fixed = max(0._r8, total - trop)
+    ratio = compute_ratio(max(0._r8, target-fixed), trop, valid .and. target >= 0._r8, eps, rmin, rmax)
+  end function compute_tropospheric_ratio
+
+  elemental logical function below_tropopause(level, trop_level, nlevels)
+    integer, intent(in) :: level, trop_level, nlevels
+    ! CAM levels run from model top to surface. Exclude the diagnosed level too.
+    ! A failed diagnosis is a closed mask, never permission to scale a column.
+    below_tropopause = trop_level >= 1 .and. trop_level <= nlevels .and. level > trop_level
+  end function below_tropopause
+
+  pure subroutine scale_profile(field, ratio, ncol, layer_mask)
+    real(r8), intent(inout) :: field(:,:)
+    real(r8), intent(in) :: ratio(:)
+    integer, intent(in) :: ncol
+    logical, optional, intent(in) :: layer_mask(:,:)
+    integer :: i, k
+    do k = 1, size(field,2)
+      do i = 1, ncol
+        if (present(layer_mask)) then
+          if (.not. layer_mask(i,k)) cycle
+        end if
+        field(i,k) = ratio(i)*field(i,k)
+      end do
+    end do
+  end subroutine scale_profile
 
   elemental function compute_ratio(target_aod, computed_aod, valid, eps, rmin, rmax) result(ratio)
     ! Return obs/model ratio clamped to [rmin,rmax]; return 1.0 (no change) when

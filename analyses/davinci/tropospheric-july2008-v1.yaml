@@ -1,0 +1,285 @@
+analysis:
+  start_time: '2008-07-01T00:00:00'
+  end_time: '2008-07-31T23:59:59'
+  output_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/tropospheric-july2008-v1
+  domain: global
+  style:
+    theme: ncar
+    context: publication
+sources:
+  maps:
+    type: generic
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/analysis-inputs/tropospheric-july2008-v1/maps.nc
+    standardize: false
+    display_name: CAM7 July Scaling Comparison
+    variables:
+      column_aod:
+        source_name: column_aod
+        units: '1'
+        display_name: CAM7 Whole-Column Analyzed AOD
+        style_preset: geosit_aod
+      tropospheric_aod:
+        source_name: tropospheric_aod
+        units: '1'
+        display_name: CAM7 Tropospheric-Scaling Analyzed AOD
+        style_preset: geosit_aod
+      tropospheric_minus_column_aod:
+        source_name: tropospheric_minus_column_aod
+        units: '1'
+        display_name: CAM7 Tropospheric Minus Whole-Column AOD
+  profiles:
+    type: generic
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/analysis-inputs/tropospheric-july2008-v1/profiles.nc
+    standardize: false
+    display_name: CAM7 July Scaling Comparison
+    variables:
+      column_mass:
+        source_name: column_mass
+        units: '1'
+        display_name: 'CAM7 Log10 MMR (kg/kg): Whole-Column Scaling'
+      tropospheric_mass:
+        source_name: tropospheric_mass
+        units: '1'
+        display_name: 'CAM7 Log10 MMR (kg/kg): Tropospheric Scaling'
+      mass_difference:
+        source_name: mass_difference
+        units: ng/kg
+        display_name: CAM7 Tropospheric Minus Whole-Column MMR
+      column_mass_increment:
+        source_name: column_mass_increment
+        units: ng/kg
+        display_name: 'CAM7 Whole-Column Scaling: Mass Increment'
+      tropospheric_mass_increment:
+        source_name: tropospheric_mass_increment
+        units: ng/kg
+        display_name: 'CAM7 Tropospheric Scaling: Mass Increment'
+      column_number_increment:
+        source_name: column_number_increment
+        units: kg-1
+        display_name: CAM7 Whole-Column Number Increment
+      tropospheric_number_increment:
+        source_name: tropospheric_number_increment
+        units: kg-1
+        display_name: CAM7 Tropospheric Number Increment
+analyses:
+  maps_mean:
+    type: gridded_analysis
+    source: maps
+    groupby: all
+    roles:
+      column_aod: column_aod
+      tropospheric_aod: tropospheric_aod
+      tropospheric_minus_column_aod: tropospheric_minus_column_aod
+    fields:
+      column_aod:
+        formula: mean(column_aod, dim="time")
+        units: '1'
+        display_name: CAM7 Whole-Column Analyzed AOD
+        style_preset: geosit_aod
+      tropospheric_aod:
+        formula: mean(tropospheric_aod, dim="time")
+        units: '1'
+        display_name: CAM7 Tropospheric-Scaling Analyzed AOD
+        style_preset: geosit_aod
+      tropospheric_minus_column_aod:
+        formula: mean(tropospheric_minus_column_aod, dim="time")
+        units: '1'
+        display_name: CAM7 Tropospheric Minus Whole-Column AOD
+  profiles_mean:
+    type: gridded_analysis
+    source: profiles
+    groupby: all
+    roles:
+      column_mass: column_mass
+      tropospheric_mass: tropospheric_mass
+      mass_difference: mass_difference
+      column_mass_increment: column_mass_increment
+      tropospheric_mass_increment: tropospheric_mass_increment
+      column_number_increment: column_number_increment
+      tropospheric_number_increment: tropospheric_number_increment
+    fields:
+      column_mass:
+        formula: mean(column_mass, dim="time")
+        units: '1'
+        display_name: 'CAM7 Log10 MMR (kg/kg): Whole-Column Scaling'
+      tropospheric_mass:
+        formula: mean(tropospheric_mass, dim="time")
+        units: '1'
+        display_name: 'CAM7 Log10 MMR (kg/kg): Tropospheric Scaling'
+      mass_difference:
+        formula: mean(mass_difference, dim="time")
+        units: ng/kg
+        display_name: CAM7 Tropospheric Minus Whole-Column MMR
+      column_mass_increment:
+        formula: mean(column_mass_increment, dim="time")
+        units: ng/kg
+        display_name: 'CAM7 Whole-Column Scaling: Mass Increment'
+      tropospheric_mass_increment:
+        formula: mean(tropospheric_mass_increment, dim="time")
+        units: ng/kg
+        display_name: 'CAM7 Tropospheric Scaling: Mass Increment'
+      column_number_increment:
+        formula: mean(column_number_increment, dim="time")
+        units: kg-1
+        display_name: CAM7 Whole-Column Number Increment
+      tropospheric_number_increment:
+        formula: mean(tropospheric_number_increment, dim="time")
+        units: kg-1
+        display_name: CAM7 Tropospheric Number Increment
+plots:
+  column_aod:
+    type: spatial
+    source: maps_mean
+    variable: column_aod
+    title: CAM7 Whole-Column Analyzed AOD
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/maps
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: '-'
+    land_color: none
+    ocean_color: none
+    show_global_mean: true
+    global_mean_decimals: 3
+    style_preset: geosit_aod
+  tropospheric_aod:
+    type: spatial
+    source: maps_mean
+    variable: tropospheric_aod
+    title: CAM7 Tropospheric-Scaling Analyzed AOD
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/maps
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: '-'
+    land_color: none
+    ocean_color: none
+    show_global_mean: true
+    global_mean_decimals: 3
+    style_preset: geosit_aod
+  tropospheric_minus_column_aod:
+    type: spatial
+    source: maps_mean
+    variable: tropospheric_minus_column_aod
+    title: CAM7 Tropospheric Minus Whole-Column AOD
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/maps
+    show_coastlines: true
+    show_countries: false
+    show_states: false
+    show_gridlines: true
+    gridline_style: '-'
+    land_color: none
+    ocean_color: none
+    show_global_mean: true
+    global_mean_decimals: 3
+    cmap: RdBu_r
+    robust: true
+    symmetric: true
+  column_mass:
+    type: vertical_profile
+    source: profiles_mean
+    variable: column_mass
+    title: 'CAM7 Log10 MMR (kg/kg): Whole-Column Scaling'
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/profiles
+    alt_coord: altitude
+  tropospheric_mass:
+    type: vertical_profile
+    source: profiles_mean
+    variable: tropospheric_mass
+    title: 'CAM7 Log10 MMR (kg/kg): Tropospheric Scaling'
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/profiles
+    alt_coord: altitude
+  mass_difference:
+    type: vertical_profile
+    source: profiles_mean
+    variable: mass_difference
+    title: CAM7 Tropospheric Minus Whole-Column MMR
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/profiles
+    alt_coord: altitude
+  column_mass_increment:
+    type: vertical_profile
+    source: profiles_mean
+    variable: column_mass_increment
+    title: 'CAM7 Whole-Column Scaling: Mass Increment'
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/profiles
+    alt_coord: altitude
+  tropospheric_mass_increment:
+    type: vertical_profile
+    source: profiles_mean
+    variable: tropospheric_mass_increment
+    title: 'CAM7 Tropospheric Scaling: Mass Increment'
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/profiles
+    alt_coord: altitude
+  column_number_increment:
+    type: vertical_profile
+    source: profiles_mean
+    variable: column_number_increment
+    title: CAM7 Whole-Column Number Increment
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/profiles
+    alt_coord: altitude
+  tropospheric_number_increment:
+    type: vertical_profile
+    source: profiles_mean
+    variable: tropospheric_number_increment
+    title: CAM7 Tropospheric Number Increment
+    domain_type:
+    - all
+    formats:
+    - pdf
+    tight_layout: true
+    output_subdir: plots/profiles
+    alt_coord: altitude
+pairs: {}
+inspection:
+  enabled: true
+  required: true
+  presets:
+  - gridded_aod_diagnostics
+  preview_format: png

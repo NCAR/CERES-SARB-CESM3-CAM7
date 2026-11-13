@@ -1,0 +1,116 @@
+schema_version: 1
+run_id: "sp3_200803_mam4_modis_era5_optics_spinup10_v1--20260915--pbs-7475584"
+case_name: "sp3_200803_mam4_modis_era5_optics_spinup10_v1"
+run_kind: "cesm"
+execution_date: "2026-09-15"
+purpose: "Continue the truncated March 2008 ERA5- and MODIS-nudged CAM7/MAM4 run from its retained March 8 restart through April 1"
+simulation:
+  calendar: "NO_LEAP"
+  restart_time_utc: "2008-03-08 21:00:00"
+  end_date: "2008-04-01"
+  end_time_utc: "2008-04-01 00:00:00"
+  duration: "555 model hours"
+  output_cadence: "3 hours; eight history records per file"
+  expected_continuation_history_records: 185
+  expected_continuation_optics_groups: 185
+  expected_continuation_optics_files: 4810
+  expected_combined_history_records: 328
+  expected_combined_optics_groups: 329
+configuration:
+  model: "CESM3 / CAM7"
+  compset: "F2000dev"
+  resolved_compset: "2000_CAM70_CLM60%SP_CICE%PRES_DOCN%DOM_MOSART_SGLC_SWAV_SESP"
+  resolution: "f09_f09_mg17"
+  chemistry: "ghg_mam4"
+  aerosol: "MAM4"
+  continuation_of: "sp3_200803_mam4_modis_era5_optics_spinup10_v1--20260908"
+  restart_pointer: "rpointer.cpl.2008-03-08-75600"
+  continue_run: true
+  stop_option: "nhours"
+  stop_n: 555
+  resubmit: 0
+  executable: "/glade/derecho/scratch/fillmore/sp3_lut_build/bld/cesm.exe"
+  executable_sha256: "e232b73691f4c80b9715a5f8cf31f6014352048cebb13d9618cc3466e0cdd7fd"
+  era5_directory: "/glade/work/fillmore/Data/CERES-SARB-CAM7/inputs/ERA5_fv09_L32_20080219_20080401_noleap_v1"
+  aod_directory: "/glade/work/fillmore/Data/CERES-SARB-CAM7/inputs/AOD_f09_3hr_20071222_20081231_v1"
+  optics_method: "lut"
+  features: {era5_met_nudging: true, modis_aod_nudging: true, band_optics: true}
+scheduler:
+  system: "Derecho PBS"
+  submission_queue: "main"
+  execution_queue: "cpu"
+  tasks: 128
+  memory_requested: "235 GB"
+  walltime_requested: "12:00:00"
+  job_id: "7475584.desched1"
+  submitted_at: "2026-09-15T13:06:12-06:00"
+  scheduler_state: "F"
+  memory_used: "143284288kb"
+  walltime_used: "01:24:44"
+  started_at: "2026-09-15T18:12:37-06:00"
+  finished_at: "2026-09-15T19:37:47-06:00"
+  exit_status: 0
+status:
+  stage: "structurally-complete"
+  model_outcome: "succeeded"
+  completed_at: "2026-09-15T19:37:47-06:00"
+  summary: "PBS and CIME completed successfully, and the combined CAM history and continuation aerosol-optics inventories passed their structural checks."
+outputs:
+  primary: "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1/optics_continuation_20080308T210000_v1"
+  case_dir: "/glade/work/fillmore/CESM3/cases/sp3_200803_mam4_modis_era5_optics_spinup10_v1"
+  run_dir: "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1/run"
+  original_optics_dir: "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1/optics"
+  continuation_optics_dir: "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1/optics_continuation_20080308T210000_v1"
+  davinci_run_dir: "/glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-03-complete"
+validation:
+  structural:
+    status: "passed"
+    checked_at: "2026-09-17"
+    summary: "The combined CAM history has all 328 expected records and required AOD variables; the continuation has 185 complete 26-band optics groups from March 9 00 UTC through April 1 00 UTC."
+    metrics:
+      combined_history_records: 328
+      continuation_optics_groups: 185
+      bands_per_group: 26
+      continuation_optics_files: 4810
+      continuation_first_stamp: "20080309.00000"
+      continuation_last_stamp: "20080401.00000"
+  numeric: {status: "pending", summary: "Awaiting continuation numeric verification."}
+  davinci:
+    status: "pending"
+    summary: "Complete-March DAVINCI pipeline is running in the shared cpudev queue; completion, manifest, artifacts, and inspection remain pending."
+    config: "analyses/davinci/era5-modis-aod-nudging-band-optics-2008-03-complete.yaml"
+    job_id: "7511793.desched1"
+    submitted_at: "2026-09-17T16:38:03-06:00"
+    scheduler_state: "R"
+    started_at: "2026-09-17T16:38:14-06:00"
+    submission_queue: "develop"
+    execution_queue: "cpudev"
+    placement: "scatter:shared"
+    previous_jobs:
+      - job_id: "7510430.desched1"
+        status: "cancelled-before-execution"
+        submission_queue: "main"
+        execution_queue: "cpu"
+        placement: "scatter:exclhost"
+    output_dir: "/glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-03-complete"
+    log: "/glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-03-complete/davinci-pbs.log"
+  science: {status: "pending", summary: "Awaiting numeric and visual scientific checks."}
+results:
+  - "The staged NO_LEAP ERA5 view contains 985 verified hourly links: 937 canonical files and 48 generated March 9-10 files."
+  - "The retained March 8 21 UTC component restart files and exact driver restart pointer are present."
+  - "The continuation requires 555 model hours and is configured to stop at April 1 00 UTC."
+  - "CAM namelist preview, conventional input-data checks, forcing coverage, shared-build compatibility, and batch preview passed before submission."
+  - "Continuation aerosol-optics output uses a separate directory to preserve the completed partial-March products."
+  - "PBS history reports successful continuation completion with exit status 0; CIME records model execution and case.run success."
+  - "Structural summary passed with 328 combined CAM history records and 185 complete continuation optics groups (4,810 files)."
+  - "DAVINCI job 7510430.desched1 was cancelled before execution because the main queue imposed exclusive-node placement on the four-CPU request."
+  - "Replacement DAVINCI job 7511793.desched1 started through develop/cpudev with shared-node placement for the complete March 1-31 analysis using 248 three-hourly inputs per selected band."
+provenance:
+  recorded_at: "2026-09-15T13:08:00-06:00"
+  sources:
+    - "/glade/work/fillmore/Data/CERES-SARB-CAM7/inputs/ERA5_fv09_L32_20080219_20080401_noleap_v1/manifest.json"
+    - "/glade/work/fillmore/Data/CERES-SARB-CAM7/logs/case_configuration/march_2008_continuation_v1/continuation-submission.json"
+    - "/glade/work/fillmore/CESM3/cases/sp3_200803_mam4_modis_era5_optics_spinup10_v1/CaseStatus"
+    - "/glade/work/fillmore/CESM3/cases/sp3_200803_mam4_modis_era5_optics_spinup10_v1/CaseDocs/atm_in"
+    - "/glade/work/fillmore/CESM3/cases/sp3_200803_mam4_modis_era5_optics_spinup10_v1/env_run.xml"
+    - "/glade/work/fillmore/CERES-SARB-CAM7/analyses/davinci/era5-modis-aod-nudging-band-optics-2008-03-complete.yaml"

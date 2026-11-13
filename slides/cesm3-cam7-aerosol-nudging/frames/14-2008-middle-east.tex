@@ -1,0 +1,30 @@
+% 14-2008-middle-east — 2008 Test Run, Middle East (dust): daily regional-mean SW AOD
+% (four bands) and LW optical depth (four bands) on the top row, CAM7 vs
+% AERONET daily AOD in the visible (546 vs 500 nm) and near-infrared
+% (842 vs 870 nm) on the bottom row. Slides 13-24 are grouped by dominant
+% aerosol type (dust, smoke, pollution, ocean outflow) and within each type
+% by decreasing AERONET 500 nm annual mean (analyses/statistics/.../README.md).
+% Sources: DAVINCI regional-aod and regional-aeronet analyses
+% (analyses/davinci/), copied under graphics/2008-regional/.
+% All four plots are 656x296pt with ~7pt margins: no trim; \regpanel
+% (preamble.tex) sets each at 0.48 of the column width, ~2.7cm tall, so
+% two rows fit under \bodyheight.
+\begin{frame}[t]
+\frametitle{2008 Middle East}
+\centering
+\regpanel{2008-regional/middle-east/middle_east_shortwave_aod.pdf}\hfill
+\regpanel{2008-regional/middle-east/middle_east_longwave_optical_depth.pdf}\par
+\vspace{0.15cm}
+\regpanel{2008-regional/middle-east/middle_east_aeronet_visible.pdf}\hfill
+\regpanel{2008-regional/middle-east/middle_east_aeronet_near_infrared.pdf}\par
+\vspace{0.1cm}
+{\tiny\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+CAM7 vs AERONET & Days & AERONET & CAM7 & Bias & Mean error & RMSE & R \\
+\midrule
+Visible (546 vs 500 nm) & 365 & 0.368 & 0.313 & $-0.055$ & 0.070 & 0.094 & 0.91 \\
+Near-infrared (842 vs 870 nm) & 365 & 0.298 & 0.206 & $-0.093$ & 0.097 & 0.129 & 0.93 \\
+\bottomrule
+\end{tabular}\par}
+\end{frame}

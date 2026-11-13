@@ -1,0 +1,17 @@
+diff --git a/cime_config/buildlib b/cime_config/buildlib
+index aaea0dbb..c2686f40 100755
+--- a/cime_config/buildlib
++++ b/cime_config/buildlib
+@@ -276,0 +277,2 @@ def _yaml_cpp_lib_path(libroot):
++    if not os.path.exists(corelib):
++        corelib = os.path.join(libroot, "lib", "libyaml-cppd.a")
+diff --git a/src/chemistry/mozart/mo_tuvx.F90 b/src/chemistry/mozart/mo_tuvx.F90
+index 6317ba28..7644277f 100644
+--- a/src/chemistry/mozart/mo_tuvx.F90
++++ b/src/chemistry/mozart/mo_tuvx.F90
+@@ -619,0 +620 @@ contains
++      integer  :: i_thrd  ! index for current OMP thread
+@@ -652 +653,2 @@ contains
+-      associate( tuvx => tuvx_ptrs( thread_id( ) ) )
++      i_thrd = thread_id()
++      associate( tuvx => tuvx_ptrs( i_thrd ) )

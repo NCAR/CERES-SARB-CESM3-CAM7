@@ -7,14 +7,15 @@ module aod_nudging_intr
   use cam_logfile,    only: iulog
   use spmd_utils,     only: masterproc, mstrid=>masterprocid, mpicom, mpi_success, &
                             mpi_integer, mpi_real8, mpi_logical, mpi_character, mpi_sum
-  use ppgrid,         only: pcols, begchunk, endchunk
+  use ppgrid,         only: pcols, pver, begchunk, endchunk
   use physics_types,  only: physics_state, physics_tend
   use physics_buffer, only: physics_buffer_desc
   use time_manager,   only: get_curr_date, get_nstep
   use cam_history,    only: addfld, outfld, horiz_only
   use radiation,      only: radiation_do
-  use aod_nudging_kernel, only: compute_ratio
+  use aod_nudging_kernel, only: compute_ratio, compute_tropospheric_ratio
   use aod_nudging_optics,  only: model_aod550, apply_scaling, n_aero_modes
+  use aod_nudging_optics, only: get_troposphere, aerosol_profiles
   use aod_nudging_obs,     only: aod_obs_init, aod_obs_update, aod_obs_target
 
   implicit none
@@ -29,6 +30,7 @@ module aod_nudging_intr
   public :: aod_nudge_active
 
   logical           :: aod_nudge_on      = .false.
+  logical           :: aod_tropo_only    = .false.
   logical           :: aod_nudge_active  = .false.
   character(len=cl) :: aod_obs_path      = ''
   character(len=cs) :: aod_obs_template  = 'MODIS_VIIRS_AOD_3hr_f09.%y%m%d.%s.nc'
@@ -57,7 +59,7 @@ contains
     integer :: unitn, ierr
     character(len=*), parameter :: prefix = 'aod_nudging_readnl: '
 
-    namelist /aod_nudging_nl/ aod_nudge_on, aod_obs_path, aod_obs_template, &
+    namelist /aod_nudging_nl/ aod_nudge_on, aod_tropo_only, aod_obs_path, aod_obs_template, &
          aod_beg_ymd, aod_end_ymd, aod_times_per_day,                       &
          aod_ratio_min, aod_ratio_max, aod_eps, aod_aci_on, aod_diag_on
 
@@ -73,6 +75,8 @@ contains
 
     call MPI_bcast(aod_nudge_on, 1, mpi_logical, mstrid, mpicom, ierr)
     if (ierr /= mpi_success) call endrun(prefix//'bcast aod_nudge_on')
+    call MPI_bcast(aod_tropo_only, 1, mpi_logical, mstrid, mpicom, ierr)
+    if (ierr /= mpi_success) call endrun(prefix//'bcast aod_tropo_only')
     call MPI_bcast(aod_obs_path, len(aod_obs_path), mpi_character, mstrid, mpicom, ierr)
     if (ierr /= mpi_success) call endrun(prefix//'bcast aod_obs_path')
     call MPI_bcast(aod_obs_template, len(aod_obs_template), mpi_character, mstrid, mpicom, ierr)
@@ -96,6 +100,7 @@ contains
 
     if (masterproc .and. aod_nudge_on) then
       write(iulog,*) 'AODNUDGE: ON  path=', trim(aod_obs_path)
+      write(iulog,*) 'AODNUDGE:     troposphere only=', aod_tropo_only
       write(iulog,*) 'AODNUDGE:     template=', trim(aod_obs_template)
       write(iulog,*) 'AODNUDGE:     beg/end_ymd=', aod_beg_ymd, aod_end_ymd, &
                      ' times/day=', aod_times_per_day
@@ -110,6 +115,18 @@ contains
     call aod_obs_init(aod_obs_path, aod_obs_template, aod_times_per_day)
 
     if (aod_diag_on) then
+      call addfld('AODNDG_TROP_PRE', horiz_only, 'I', '1', 'Eligible tropospheric AOD before update')
+      call addfld('AODNDG_TROP_POST', horiz_only, 'I', '1', 'Eligible tropospheric AOD after update')
+      call addfld('AODNDG_FIXED_PRE', horiz_only, 'I', '1', 'Excluded AOD before update')
+      call addfld('AODNDG_FIXED_POST', horiz_only, 'I', '1', 'Excluded AOD after update')
+      call addfld('AODNDG_TROP_P', horiz_only, 'I', 'Pa', 'Native tropopause pressure used by AOD nudging')
+      call addfld('AODNDG_TROP_LEV', horiz_only, 'I', '1', 'Native tropopause level, excluded from scaling')
+      call addfld('AODNDG_TROP_MASK', (/ 'lev' /), 'I', '1', 'Layers strictly below the native tropopause level')
+      call addfld('AODNDG_PMID', (/ 'lev' /), 'I', 'Pa', 'Midlevel pressure at the AOD update')
+      call addfld('AODNDG_MMR_PRE', (/ 'lev' /), 'I', 'kg/kg', 'Interstitial plus bulk aerosol mass before update')
+      call addfld('AODNDG_MMR_POST', (/ 'lev' /), 'I', 'kg/kg', 'Interstitial plus bulk aerosol mass after update')
+      call addfld('AODNDG_NUM_PRE', (/ 'lev' /), 'I', '1/kg', 'Interstitial aerosol number before update')
+      call addfld('AODNDG_NUM_POST', (/ 'lev' /), 'I', '1/kg', 'Interstitial aerosol number after update')
       call addfld('AODNDG_OBS',        horiz_only, 'I', '1', &
                   'AOD nudging: target (obs) AOD at 550nm')
       call addfld('AODNDG_MODEL_PRE',  horiz_only, 'I', '1', &
@@ -177,6 +194,11 @@ contains
 
     integer  :: ncol, lchnk, nstep
     real(r8) :: aod_pre(pcols), aod_post(pcols)
+    real(r8) :: trop_pre(pcols), trop_post(pcols), trop_p(pcols)
+    real(r8) :: mass_pre(pcols,pver), mass_post(pcols,pver)
+    real(r8) :: num_pre(pcols,pver), num_post(pcols,pver)
+    logical :: trop_mask(pcols,pver), scale_mask(pcols,pver)
+    integer :: trop_level(pcols)
     real(r8) :: target_aod(pcols), ratio(pcols)
     logical  :: valid(pcols)
     real(r8) :: maskr(pcols)
@@ -190,25 +212,51 @@ contains
     nstep    = get_nstep()
     zero_flx = 0._r8
 
-    call model_aod550(state, pbuf, aod_pre)
+    call get_troposphere(state, trop_mask, trop_p, trop_level)
+    call model_aod550(state, pbuf, aod_pre, trop_mask, trop_pre)
+    if (aod_diag_on) call aerosol_profiles(state, pbuf, mass_pre, num_pre)
     call aod_obs_target(lchnk, ncol, target_aod, valid)
 
     ratio = 1._r8
-    ratio(:ncol) = compute_ratio(target_aod(:ncol), aod_pre(:ncol), valid(:ncol), &
-                                 aod_eps, aod_ratio_min, aod_ratio_max)
+    scale_mask = .true.
+    if (aod_tropo_only) then
+      scale_mask = trop_mask
+      ratio(:ncol) = compute_tropospheric_ratio(target_aod(:ncol), aod_pre(:ncol), trop_pre(:ncol), &
+                                               valid(:ncol), aod_eps, aod_ratio_min, aod_ratio_max)
+      valid(:ncol) = valid(:ncol) .and. target_aod(:ncol) >= 0._r8 .and. trop_pre(:ncol) >= aod_eps
+    else
+      ratio(:ncol) = compute_ratio(target_aod(:ncol), aod_pre(:ncol), valid(:ncol), &
+                                   aod_eps, aod_ratio_min, aod_ratio_max)
+      valid(:ncol) = valid(:ncol) .and. target_aod(:ncol) >= 0._r8 .and. aod_pre(:ncol) >= aod_eps
+    end if
 
+    !$omp critical(aod_nudge_counts)
     acc_ncol     = acc_ncol     + ncol
     acc_nvalid   = acc_nvalid   + count(valid(:ncol))
     acc_clamp_lo = acc_clamp_lo + count(valid(:ncol) .and. ratio(:ncol) == aod_ratio_min)
     acc_clamp_hi = acc_clamp_hi + count(valid(:ncol) .and. ratio(:ncol) == aod_ratio_max)
+    !$omp end critical(aod_nudge_counts)
 
     call check_energy_cam_chng(state, tend, 'AODNUDGE_pre', nstep, ztodt, &
                                zero_flx, zero_flx, zero_flx, zero_flx)
 
-    call apply_scaling(state, pbuf, ratio, aod_aci_on)
-    call model_aod550(state, pbuf, aod_post)
+    call apply_scaling(state, pbuf, ratio, aod_aci_on, scale_mask)
+    call model_aod550(state, pbuf, aod_post, trop_mask, trop_post)
 
     if (aod_diag_on) then
+      call aerosol_profiles(state, pbuf, mass_post, num_post)
+      call outfld('AODNDG_TROP_PRE', trop_pre, ncol, lchnk)
+      call outfld('AODNDG_TROP_POST', trop_post, ncol, lchnk)
+      call outfld('AODNDG_FIXED_PRE', aod_pre-trop_pre, ncol, lchnk)
+      call outfld('AODNDG_FIXED_POST', aod_post-trop_post, ncol, lchnk)
+      call outfld('AODNDG_TROP_P', trop_p, ncol, lchnk)
+      call outfld('AODNDG_TROP_LEV', real(trop_level,r8), ncol, lchnk)
+      call outfld('AODNDG_TROP_MASK', merge(1._r8,0._r8,trop_mask), pcols, lchnk)
+      call outfld('AODNDG_PMID', state%pmid, pcols, lchnk)
+      call outfld('AODNDG_MMR_PRE', mass_pre, pcols, lchnk)
+      call outfld('AODNDG_MMR_POST', mass_post, pcols, lchnk)
+      call outfld('AODNDG_NUM_PRE', num_pre, pcols, lchnk)
+      call outfld('AODNDG_NUM_POST', num_post, pcols, lchnk)
       maskr = 0._r8
       where (valid(:ncol)) maskr(:ncol) = 1._r8
       call outfld('AODNDG_OBS',        target_aod(:ncol), ncol, lchnk)

@@ -17,8 +17,12 @@ module aod_nudging_optics
                                  rad_cnst_get_aer_mmr, rad_cnst_get_bin_mmr_by_idx
   use cam_abortutils,      only: endrun
 
+  use aod_nudging_kernel, only: below_tropopause, scale_profile
+  use tropopause, only: find_tropopause => tropopause_find_cam
+
   implicit none
   private
+  public :: get_troposphere, aerosol_profiles
 
   public :: model_aod550
   public :: apply_scaling
@@ -29,7 +33,7 @@ module aod_nudging_optics
 
 contains
 
-  subroutine model_aod550(state, pbuf, aod)
+  subroutine model_aod550(state, pbuf, aod, layer_mask, trop_aod)
     ! Column AOD at 550 nm = vertical sum of the visible-band layer optical depth,
     ! computed from the CURRENT aerosol state by CAM7's own optics. nnite=0 makes
     ! the routine diagnose every column (day and night); tauxar is filled for all
@@ -38,6 +42,8 @@ contains
     type(physics_buffer_desc), pointer            :: pbuf(:)
     real(r8),                  intent(out)         :: aod(:)   ! (pcols)
 
+    logical, optional, intent(in) :: layer_mask(:,:)
+    real(r8), optional, intent(out) :: trop_aod(:)
     real(r8) :: tauxar(pcols,0:pver,nswbands)
     real(r8) :: wa(pcols,0:pver,nswbands)
     real(r8) :: ga(pcols,0:pver,nswbands)
@@ -56,47 +62,43 @@ contains
 
     aod = 0._r8
     aod(:ncol) = sum(tauxar(:ncol, 0:pver, idx_sw_diag), dim=2)
+    if (present(trop_aod)) then
+      if (.not. present(layer_mask)) call endrun('AODNUDGE: eligible AOD requires a layer mask')
+      trop_aod = 0._r8
+      trop_aod(:state%ncol) = sum(tauxar(:state%ncol,1:pver,idx_sw_diag), dim=2, &
+                                      mask=layer_mask(:state%ncol,:))
+    end if
   end subroutine model_aod550
 
-  subroutine apply_scaling(state, pbuf, ratio, aci_on)
-    ! Multiply every interstitial-phase ('a') aerosol species mass, every mode/bin
-    ! number mixing ratio, and every bulk-aerosol mass by the per-column ratio.
-    ! Enumeration is generic (rad_cnst_*) so this works unchanged for MAM4/MAM5 and
-    ! remains aligned with the same climate-list aerosol state used by model_aod550.
-    ! The mmr/num pointers alias state%q (or pbuf), so assigning through them
-    ! overwrites the current aerosol state in place. ratio==1 columns are no-ops.
-    ! aci_on (SPEC D5): direct effect (v1) touches ONLY the interstitial 'a' phase.
-    ! When aci_on=.true. the routine routes to the reserved cloud-borne ('c') / ACI
-    ! path, which is guarded (not validated in v1) but kept as a real, marked
-    ! insertion point so the interface is ACI-ready.
+  subroutine apply_scaling(state, pbuf, ratio, aci_on, layer_mask)
+    ! Restrict every enumerated mass/number field and optical cache to exactly
+    ! the same eligible layers. Absent mask retains whole-column compatibility.
     type(physics_state),       intent(inout), target :: state
     type(physics_buffer_desc), pointer               :: pbuf(:)
     real(r8),                  intent(in)             :: ratio(:)   ! (pcols)
     logical,                   intent(in)             :: aci_on     ! cloud-borne/ACI hook
 
-    integer           :: nmodes, nbins, naero, nspec, m, l, icol, ncol
+    logical, optional, intent(in) :: layer_mask(:,:)
+    integer           :: nmodes, nbins, naero, nspec, m, l, ncol
     real(r8), pointer :: num(:,:)
     real(r8), pointer :: mmr(:,:)
     real(r8), pointer :: naer(:,:,:)
     real(r8), pointer :: qaerwat(:,:,:)
 
+    if (aci_on) call endrun('AODNUDGE: cloud-borne aerosol scaling is not implemented')
     ncol = state%ncol
     call rad_cnst_get_info(LIST_CLIMATE, nmodes=nmodes, nbins=nbins, naero=naero)
 
     do m = 1, nmodes
       ! Interstitial mode number mixing ratio.
       call rad_cnst_get_mode_num(LIST_CLIMATE, m, 'a', state, pbuf, num)
-      do icol = 1, ncol
-        num(icol,:) = ratio(icol) * num(icol,:)
-      end do
+      call scale_profile(num, ratio, ncol, layer_mask)
 
       ! Each interstitial species mass mixing ratio in this mode.
       call rad_cnst_get_info(LIST_CLIMATE, m, nspec=nspec)
       do l = 1, nspec
         call rad_cnst_get_aer_mmr(LIST_CLIMATE, m, l, 'a', state, pbuf, mmr)
-        do icol = 1, ncol
-          mmr(icol,:) = ratio(icol) * mmr(icol,:)
-        end do
+        call scale_profile(mmr, ratio, ncol, layer_mask)
       end do
     end do
 
@@ -104,58 +106,84 @@ contains
       call pbuf_get_field(pbuf, pbuf_get_index('NAER'), naer)
       call pbuf_get_field(pbuf, pbuf_get_index('QAERWAT'), qaerwat)
       do m = 1, nmodes
-        do icol = 1, ncol
-          naer(icol,:,m)    = ratio(icol) * naer(icol,:,m)
-          qaerwat(icol,:,m) = ratio(icol) * qaerwat(icol,:,m)
-        end do
+        call scale_profile(naer(:,:,m), ratio, ncol, layer_mask)
+        call scale_profile(qaerwat(:,:,m), ratio, ncol, layer_mask)
       end do
     end if
 
     ! CARMA/bin aerosols, when present, are a separate radiation-constituent path.
     do m = 1, nbins
       call rad_cnst_get_bin_num(LIST_CLIMATE, m, 'a', state, pbuf, num)
-      do icol = 1, ncol
-        num(icol,:) = ratio(icol) * num(icol,:)
-      end do
+      call scale_profile(num, ratio, ncol, layer_mask)
 
       call rad_cnst_get_info_by_bin(LIST_CLIMATE, m, nspec=nspec)
       do l = 1, nspec
         call rad_cnst_get_bin_mmr_by_idx(LIST_CLIMATE, m, l, 'a', state, pbuf, mmr)
-        do icol = 1, ncol
-          mmr(icol,:) = ratio(icol) * mmr(icol,:)
-        end do
+        call scale_profile(mmr, ratio, ncol, layer_mask)
       end do
     end do
 
     ! Bulk aerosols are also included by aerosol_optics_cam_sw when naero > 0.
     do m = 1, naero
       call rad_cnst_get_aer_mmr(LIST_CLIMATE, m, state, pbuf, mmr)
-      do icol = 1, ncol
-        mmr(icol,:) = ratio(icol) * mmr(icol,:)
-      end do
+      call scale_profile(mmr, ratio, ncol, layer_mask)
     end do
 
-    ! ----------------------------------------------------------------------------
-    ! ACI hook (SPEC D5 / section 2): present but OFF in v1. Direct-effect nudging must
-    ! NOT touch the cloud-borne ('c') phase, so the default path above is complete.
-    ! Turning on aod_aci_on selects the cloud-borne pathway, which is not validated
-    ! in v1 -> abort cleanly rather than silently scale an unverified phase.
-    ! ----------------------------------------------------------------------------
-    if (aci_on) then
-      call endrun('apply_scaling: aod_aci_on=.true. selects the cloud-borne/ACI path, '// &
-                  'which is not implemented/validated in v1 (direct effect only)')
-      ! FUTURE ACI IMPLEMENTATION (mirror the 'a' loop with phase 'c'):
-      !   do m = 1, nmodes
-      !     call rad_cnst_get_mode_num(LIST_CLIMATE, m, 'c', state, pbuf, num)
-      !     do icol = 1, ncol ; num(icol,:) = ratio(icol)*num(icol,:) ; end do
-      !     call rad_cnst_get_info(LIST_CLIMATE, m, nspec=nspec)
-      !     do l = 1, nspec
-      !       call rad_cnst_get_aer_mmr(LIST_CLIMATE, m, l, 'c', state, pbuf, mmr)
-      !       do icol = 1, ncol ; mmr(icol,:) = ratio(icol)*mmr(icol,:) ; end do
-      !     end do
-      !   end do
-    end if
   end subroutine apply_scaling
+
+  subroutine get_troposphere(state, layer_mask, trop_p, trop_level)
+    type(physics_state), intent(in) :: state
+    logical, intent(out) :: layer_mask(:,:)
+    real(r8), intent(out) :: trop_p(:)
+    integer, intent(out) :: trop_level(:)
+    integer :: i, k
+    ! Use CAM's native TWMO diagnosis and its climatology fallback. Freeze this
+    ! boundary for both optical probes and the entire current state update.
+    trop_level = -1
+    trop_p = 0._r8
+    call find_tropopause(state, trop_level, tropP=trop_p)
+    layer_mask = .false.
+    do k = 1, pver
+      do i = 1, state%ncol
+        layer_mask(i,k) = below_tropopause(k, trop_level(i), pver)
+      end do
+    end do
+  end subroutine get_troposphere
+
+  subroutine aerosol_profiles(state, pbuf, mass, number)
+    type(physics_state), intent(in), target :: state
+    type(physics_buffer_desc), pointer :: pbuf(:)
+    real(r8), intent(out) :: mass(:,:), number(:,:)
+    real(r8), pointer :: field(:,:)
+    integer :: nmodes, naero, nspec, m, l
+    integer :: nbins
+    mass = 0._r8
+    number = 0._r8
+    call rad_cnst_get_info(LIST_CLIMATE, nmodes=nmodes, naero=naero)
+    do m = 1, nmodes
+      call rad_cnst_get_mode_num(LIST_CLIMATE, m, 'a', state, pbuf, field)
+      number(:state%ncol,:) = number(:state%ncol,:) + field(:state%ncol,:)
+      call rad_cnst_get_info(LIST_CLIMATE, m, nspec=nspec)
+      do l = 1, nspec
+        call rad_cnst_get_aer_mmr(LIST_CLIMATE, m, l, 'a', state, pbuf, field)
+        mass(:state%ncol,:) = mass(:state%ncol,:) + field(:state%ncol,:)
+      end do
+    end do
+    call rad_cnst_get_info(LIST_CLIMATE, nbins=nbins)
+    do m = 1, nbins
+      call rad_cnst_get_bin_num(LIST_CLIMATE, m, 'a', state, pbuf, field)
+      number(:state%ncol,:) = number(:state%ncol,:) + field(:state%ncol,:)
+      call rad_cnst_get_info_by_bin(LIST_CLIMATE, m, nspec=nspec)
+      do l = 1, nspec
+        call rad_cnst_get_bin_mmr_by_idx(LIST_CLIMATE, m, l, 'a', state, pbuf, field)
+        mass(:state%ncol,:) = mass(:state%ncol,:) + field(:state%ncol,:)
+      end do
+    end do
+    do m = 1, naero
+      call rad_cnst_get_aer_mmr(LIST_CLIMATE, m, state, pbuf, field)
+      mass(:state%ncol,:) = mass(:state%ncol,:) + field(:state%ncol,:)
+    end do
+  end subroutine aerosol_profiles
 
   integer function n_aero_modes()
     ! Number of aerosol modes in the climate list (4 for MAM4, 5 for MAM5).

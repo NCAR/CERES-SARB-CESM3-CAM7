@@ -1,0 +1,4 @@
+interface:
+  display_name: "CERES Preprocess with DAVINCI"
+  short_description: "Build validated observation inputs for CERES runs"
+  default_prompt: "Use $preprocess-ceres-data to stage, build, and validate run-ready AOD inputs with the SP1 and DAVINCI workflow."

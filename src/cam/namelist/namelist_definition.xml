@@ -484,6 +484,14 @@
        hard-overwritten before radiation so column AOD@550nm matches the obs file.
        Default: FALSE
 </entry>
+<entry id="aod_tropo_only" type="logical" category="aod_nudging"
+       group="aod_nudging_nl" valid_values="" >
+       Restrict aerosol mass, number, and optical-cache scaling to model levels
+       strictly below CAM's diagnosed tropopause level. Leave the diagnosed level
+       and all levels above it unchanged. Fit the observed column AOD after
+       subtracting the fixed excluded AOD; apply aod_eps to eligible AOD.
+       Default: FALSE (whole-column scaling).
+</entry>
 <entry id="aod_obs_path" type="char*256" category="aod_nudging"
        group="aod_nudging_nl" valid_values="" >
        Directory containing the contract obs files (trailing slash recommended).

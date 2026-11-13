@@ -1,0 +1,72 @@
+schema_version: 1
+run_id: "sp2_200807_mam4_modis--20260628"
+case_name: "sp2_200807_mam4_modis"
+run_kind: "cesm"
+execution_date: "2026-06-28"
+purpose: "Full-month July 2008 CAM7 run with MODIS AOD nudging"
+simulation:
+  start_date: "2008-07-01"
+  end_date: "2008-08-01"
+  duration: "31 days"
+  output_cadence: "3 hours"
+configuration:
+  model: "CESM3 / CAM7"
+  compset: "F2000dev"
+  resolution: "f09_f09_mg17"
+  chemistry: "ghg_mam4"
+  aerosol: "MAM4"
+  case_setup_script: "scripts/setup_sp2_july2008_runs.sh"
+  executable: "/glade/derecho/scratch/fillmore/sp2_200807_mam4_modis/bld/cesm.exe"
+  features:
+    era5_met_nudging: false
+    modis_aod_nudging: true
+    band_optics: false
+scheduler:
+  system: "Derecho PBS"
+  job_id: "6581712.desched1"
+  submission_queue: "main"
+  tasks: 128
+  walltime_used: "00:53:42"
+  exit_status: 0
+status:
+  stage: "structurally-complete"
+  model_outcome: "succeeded"
+  completed_at: "2026-06-28T23:49:30-06:00"
+  summary: "Model and full-month output inventory completed; remaining numeric/science gates were not recorded on this run."
+outputs:
+  primary: "/glade/derecho/scratch/fillmore/sp2_200807_mam4_modis/run"
+  case_dir: "/glade/work/fillmore/CESM3/cases/sp2_200807_mam4_modis"
+  run_dir: "/glade/derecho/scratch/fillmore/sp2_200807_mam4_modis/run"
+  davinci_run_dir: "/glade/work/fillmore/Data/CERES-SARB-CAM7/runs/cam-aod-monthly-analysis-july-2008"
+  accepted_plots: "/glade/work/fillmore/Data/CERES-SARB-CAM7/plots/modis-aod-nudging-july-2008"
+validation:
+  structural:
+    status: "passed"
+    checked_at: "2026-07-13"
+    summary: "h0a and h0i each contain 248 three-hourly July records; expected AOD and radiation fields are present."
+    metrics:
+      h0a_records: 248
+      h0i_records: 248
+      first_h0i_record: "20080701:10800"
+      last_h0i_record: "20080801:0"
+  numeric:
+    status: "not-recorded"
+    summary: "No full-month guard-aware numeric gate result is recorded for this preserved case."
+  davinci:
+    status: "passed"
+    checked_at: "2026-07-13"
+    summary: "The full-month CAM AOD DAVINCI pipeline and automated inspection passed."
+    config: "analyses/davinci/cam-aod-monthly-analysis-july-2008.yaml"
+    plot_count: 192
+  science:
+    status: "not-recorded"
+    summary: "The registry does not contain a separate visual scientific-acceptance decision for this case."
+results:
+  - "AOD nudging diagnostics cover the full July window through the August 1 boundary record."
+  - "The free-running reference is recorded separately."
+provenance:
+  recorded_at: "2026-07-25T08:57:20-06:00"
+  sources:
+    - "RUN.md"
+    - "docs/HANDOFF.md"
+    - "/glade/work/fillmore/CESM3/cases/sp2_200807_mam4_modis/CaseStatus"

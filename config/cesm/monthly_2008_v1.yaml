@@ -1,0 +1,48 @@
+schema_version: 1
+calendar: NO_LEAP
+spinup_days: 10
+cesm_root: /glade/work/fillmore/CESM3/cesm3_0_beta08
+cesm_commit: 8ce857e8ba55bf7aeca11d93562e36abd635e5a0
+base_case: /glade/work/fillmore/CESM3/cases/sp3_lut_build
+case_root: /glade/work/fillmore/CESM3/cases
+case_name_template: sp3_{month}_mam4_modis_era5_optics_spinup10_v1
+compset_alias: F2000dev
+compset: 2000_CAM70_CLM60%SP_CICE%PRES_DOCN%DOM_MOSART_SGLC_SWAV_SESP
+resolution: f09_f09_mg17
+machine: derecho
+compiler: intel
+mpilib: mpich
+project: P19010000
+tasks: 128
+threads: 1
+queue: main
+walltime: '12:00:00'
+exeroot: /glade/derecho/scratch/fillmore/sp3_lut_build/bld
+executable_sha256: e232b73691f4c80b9715a5f8cf31f6014352048cebb13d9618cc3466e0cdd7fd
+output_root: /glade/derecho/scratch/fillmore/CERES-SARB-CAM7/monthly_2008_v1
+preservation_root: /glade/work/fillmore/Data/CERES-SARB-CAM7/model_output/monthly_2008_v1
+log_root: /glade/work/fillmore/Data/CERES-SARB-CAM7/logs/case_configuration/monthly_2008_v1
+aod_directory: /glade/work/fillmore/Data/CERES-SARB-CAM7/inputs/AOD_f09_3hr_20071222_20081231_v1
+aod_sources:
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/AOD_f09_3hr_20071222_20071231_v1
+  - /glade/work/fillmore/Data/CERES-SARB-CAM7/AOD_f09_3hr_2008_v2
+era5_directory: /glade/campaign/cgd/amp/wchapman/Nudging_ERA5/fv_L32_ncl
+lut_file: /glade/work/fillmore/Data/CERES-SARB-CAM7/optics/aod_lfl_lut_mam4_camref_dense3_20260709.nc
+lw_table: /glade/work/fillmore/Data/CERES-SARB-CAM7/optics/aod_lw_omega_g.nc
+cam_initial_file: /glade/campaign/cesm/cesmdata/inputdata/atm/cam/inic/fv/cami-mam3_0000-01-01_0.9x1.25_L32_c141031.nc
+namelist_template: config/cesm/monthly_2008_user_nl_cam.template
+months:
+  - month: '2008-01'
+  - month: '2008-02'
+  - month: '2008-03'
+    stop: '2008-03-08T21:00:00'
+    reason: 'ERA5 is missing March 9-10; stop on the last safe three-hour output before the gap.'
+  - month: '2008-04'
+  - month: '2008-05'
+  - month: '2008-06'
+  - month: '2008-07'
+  - month: '2008-08'
+  - month: '2008-09'
+  - month: '2008-10'
+  - month: '2008-11'
+  - month: '2008-12'

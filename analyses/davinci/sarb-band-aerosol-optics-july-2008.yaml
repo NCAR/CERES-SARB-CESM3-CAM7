@@ -1,0 +1,153 @@
+analysis:
+  start_time: "2008-07-01T00:00:00"
+  end_time: "2008-07-11T00:00:00"
+  output_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/sarb-band-aerosol-optics-july-2008
+  domain: global
+  style:
+    theme: ncar
+    context: publication
+
+sources:
+  visible_band_optics_files:
+    type: generic
+    display_name: SARB Visible Band Aerosol Optics
+    files: /glade/derecho/scratch/fillmore/sp3v2_verify10_lut_on_camref_dense3_20260709/AER_MAM4_SW05.200807*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      visible_column_extinction_source:
+        source_name: Extinction_Column_Optical_Depth
+        units: "1"
+        valid_min: 0.0
+        display_name: Visible Band Column Extinction Optical Depth
+        style_preset: geosit_aod
+      visible_layer_extinction_source:
+        source_name: Extinction_Layer_Optical_Depth
+        units: "1"
+        valid_min: 0.0
+        display_name: Visible Band Layer Extinction Optical Depth
+      visible_layer_scattering_source:
+        source_name: Scattering_Layer_Optical_Depth
+        units: "1"
+        valid_min: 0.0
+        display_name: Visible Band Layer Scattering Optical Depth
+      visible_layer_asymmetry_source:
+        source_name: Layer_Asymmetry_Parameter
+        units: "1"
+        valid_min: 0.0
+        valid_max: 1.0
+        display_name: Visible Band Layer Asymmetry Parameter
+  longwave_window_optics_files:
+    type: generic
+    display_name: SARB Longwave Window Aerosol Optics
+    files: /glade/derecho/scratch/fillmore/sp3v2_verify10_lut_on_camref_dense3_20260709/AER_MAM4_LW06.200807*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      longwave_window_column_extinction_source:
+        source_name: Extinction_Column_Optical_Depth
+        units: "1"
+        valid_min: 0.0
+        display_name: Longwave Window Column Extinction Optical Depth
+        style_preset: geosit_aod
+      longwave_window_layer_extinction_source:
+        source_name: Extinction_Layer_Optical_Depth
+        units: "1"
+        valid_min: 0.0
+        display_name: Longwave Window Layer Extinction Optical Depth
+      longwave_window_layer_scattering_source:
+        source_name: Scattering_Layer_Optical_Depth
+        units: "1"
+        valid_min: 0.0
+        display_name: Longwave Window Layer Scattering Optical Depth
+      longwave_window_layer_asymmetry_source:
+        source_name: Layer_Asymmetry_Parameter
+        units: "1"
+        valid_min: 0.0
+        valid_max: 1.0
+        display_name: Longwave Window Layer Asymmetry Parameter
+
+analyses:
+  sarb_visible_optics:
+    type: gridded_analysis
+    source: visible_band_optics_files
+    groupby: all
+    roles:
+      column_extinction: visible_column_extinction_source
+      layer_extinction: visible_layer_extinction_source
+      layer_scattering: visible_layer_scattering_source
+      layer_asymmetry: visible_layer_asymmetry_source
+    fields:
+      visible_column_aod:
+        formula: 'mean(column_extinction, dim="time")'
+        units: "1"
+        long_name: Ten-day mean visible band column aerosol optical depth
+        display_name: Visible Column AOD
+        style_preset: geosit_aod
+      visible_single_scatter_albedo:
+        formula: 'sum(mean(layer_scattering, dim="time"), dim="z") / sum(mean(layer_extinction, dim="time"), dim="z")'
+        units: "1"
+        long_name: Ten-day mean visible band single-scatter albedo
+        display_name: Visible Single-Scatter Albedo
+      visible_asymmetry:
+        formula: 'sum(mean(layer_asymmetry * layer_scattering, dim="time"), dim="z") / sum(mean(layer_scattering, dim="time"), dim="z")'
+        units: "1"
+        long_name: Ten-day mean visible band asymmetry parameter
+        display_name: Visible Asymmetry Parameter
+    output_group: sarb_band_aerosol_optics
+  sarb_longwave_window_optics:
+    type: gridded_analysis
+    source: longwave_window_optics_files
+    groupby: all
+    roles:
+      column_extinction: longwave_window_column_extinction_source
+      layer_extinction: longwave_window_layer_extinction_source
+      layer_scattering: longwave_window_layer_scattering_source
+      layer_asymmetry: longwave_window_layer_asymmetry_source
+    fields:
+      lw_window_scattering:
+        formula: 'sum(mean(layer_scattering, dim="time"), dim="z")'
+        units: "1"
+        long_name: Ten-day mean longwave window column scattering optical depth
+        display_name: LW Window Scattering
+      lw_window_extinction:
+        formula: 'mean(column_extinction, dim="time")'
+        units: "1"
+        long_name: Ten-day mean longwave window column extinction optical depth
+        display_name: LW Window Extinction
+        style_preset: geosit_aod
+    output_group: sarb_band_aerosol_optics
+
+plot_suites:
+  visible_optics:
+    preset: sarb_band_aerosol_optics
+    source: sarb_visible_optics
+    output_subdir: plots/visible-optics
+    overrides: &map_overrides
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+      show_coastlines: true
+      show_countries: false
+      show_states: false
+      show_gridlines: true
+      gridline_style: "-"
+      land_color: none
+      ocean_color: none
+  longwave_window_optics:
+    preset: sarb_band_aerosol_optics
+    source: sarb_longwave_window_optics
+    output_subdir: plots/longwave-window-optics
+    overrides: *map_overrides
+
+plots: {}
+pairs: {}
+
+inspection:
+  enabled: true
+  required: true
+  presets:
+    - sarb_band_aerosol_optics
+  preview_format: png

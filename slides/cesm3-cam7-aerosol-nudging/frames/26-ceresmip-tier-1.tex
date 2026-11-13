@@ -1,0 +1,43 @@
+% 26-ceresmip-tier-1 — CERESMIP, "Tier 1": the protocol (Schmidt et al. 2023,
+% Front. Clim. 5:1202161; GISS site revision of 2026-02-02) and the CESM3/CAM7
+% entry run. Science-level only (no code identifiers). Facts:
+% ../CERES-MIP/fable/02-ceresmip-protocol.md and 09-run-plan.md.
+% Layout budget as slide 02: ten body lines per column, lines under ~36
+% characters; the \tiny frame footnote (the paper's f-index sentence) costs
+% one of those lines in each column, so the blocks carry nine.
+\begin{frame}[t]
+\frametitle{Tier 1}
+\footnotesize
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}
+\begin{block}{CERESMIP}
+\begin{itemize}
+  \item Schmidt et al. (2023), NASA GISS:\\AMIP-style runs over the CERES era
+  \item Energy imbalance rising $\sim$0.45 W m$^{-2}$\\per decade; models get about half
+\end{itemize}
+\end{block}
+\begin{block}{Tier 1: One All-Forcings Run}
+\begin{itemize}
+  \item One AMIP run, 1990--2024,\\with the updated CMIP7 forcings
+  \item Observed SST and sea ice;\\analysis 2001--2024 against EBAF
+  \item Monthly fields; COSP recommended
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.49\textwidth}
+\begin{block}{CESM3/CAM7 Entry}
+\begin{itemize}
+  \item Free-running MAM4, CEDS emissions
+  \item Companion run constrained to MODIS,\\then NOAA-20 VIIRS from April 2022
+  \item Submitted as two forcing variants\\of the same experiment\footnote[frame]{\tiny Schmidt et al. (2023): ``Any of these experiments can be redone using alternative forcing sets to explore, for instance, aerosol uncertainty, using the `f' designation in the \#ripf simulation descriptor.''}
+\end{itemize}
+\end{block}
+\begin{block}{Evaluation}
+\begin{itemize}
+  \item Clear- and all-sky TOA SW and LW\\against EBAF Ed4.2.1
+  \item Column scale factor archived:\\where the emission trend is wrong
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}

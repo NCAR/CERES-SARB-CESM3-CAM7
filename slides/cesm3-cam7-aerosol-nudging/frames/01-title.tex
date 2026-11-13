@@ -1,0 +1,25 @@
+% Title slide: title and date only. No authors, no subtitle (informal
+% group-meeting talk).
+\begin{frame}[t]
+  % -0.5cm: the third title line (user-requested) needs the room; title up,
+  % logo down (user-requested).
+  \vspace*{-0.5cm}
+  \begin{center}
+    {\fontsize{34}{40}\selectfont\bfseries\color{accent}
+     \PosterTitleBreak\par}
+  \end{center}
+  \vspace{0.85cm}
+  % Date and venue right-justified, clear of the logo (user-requested).
+  \begin{flushright}
+    {\large\insertdate\par}
+    \vspace{0.15em}
+    {\large NASA Langley Research Center\par}
+  \end{flushright}
+  % NASA meatball, bottom left — height 2.6cm, xshift 3.4cm to clear the
+  % 2.6cm Berkeley sidebar with a gutter. Overlay, so it costs no flow height.
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=south west]
+      at ([xshift=3.4cm, yshift=0.1cm]current page.south west)
+      {\includegraphics[height=2.6cm, width=0.46\textwidth, keepaspectratio]{\themelogo}};
+  \end{tikzpicture}
+\end{frame}

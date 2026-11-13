@@ -1,0 +1,22 @@
+# SP1 pipeline run configuration. 2008-10 MODIS-only forcing, written to
+# the v2 annual directory after repairing the DAVINCI/MonetIO HDF reader.
+modis_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/MODIS_VIIRS_L2
+viirs_dir: ""
+out_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/AOD_f09_3hr_2008_v2
+stage_root: /glade/work/fillmore/Data/CERES-SARB-CAM7
+start: 2008-10-01
+end: 2008-10-31
+modis_qa_min: 1
+viirs_qa_min: 2
+aod_min: 0.0
+aod_max: 5.0
+sigma_max: 5.0
+modis_ee_land: [0.05, 0.15]
+modis_ee_ocean: [0.03, 0.05]
+sigma_floor: 0.001
+bias_coeff_file: /glade/work/fillmore/Data/CERES-SARB-CAM7/bias_coeffs.json
+modis_product: MOD04_L2
+modis_product_aqua: MYD04_L2
+viirs_product: AERDB_L2_VIIRS_NOAA20
+collection: "6.1"
+viirs_collection: "2"

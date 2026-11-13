@@ -1,0 +1,7 @@
+name: cesm3-tools
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - perl=5.32.1
+  - perl-xml-libxml=2.0210

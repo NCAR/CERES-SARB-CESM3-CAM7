@@ -1,0 +1,4 @@
+interface:
+  display_name: "CERES Run Closeout"
+  short_description: "Audit and record CESM run acceptance evidence"
+  default_prompt: "Use $closeout-ceres-runs to audit the latest CERES case, update its run-history record, and report its evidence-backed stage."

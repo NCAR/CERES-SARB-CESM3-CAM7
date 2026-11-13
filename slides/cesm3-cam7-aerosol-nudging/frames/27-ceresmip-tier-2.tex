@@ -1,0 +1,51 @@
+% 27-ceresmip-tier-2 — CERESMIP, "Tier 2": the ten Tier 2 experiments as
+% renumbered on the GISS site (2026-02-02), all 1990--2024, and the CESM3/CAM7
+% runs planned against them. Science-level only. Facts:
+% ../CERES-MIP/fable/02-ceresmip-protocol.md (Table 2) and 09-run-plan.md.
+% Layout budget as slide 02: ten body lines in the right column (two blocks
+% of three items, one of them single-line), lines under ~34 characters in
+% this narrower column. The table column has room to spare.
+\begin{frame}[t]
+\frametitle{Tier 2}
+\footnotesize
+\begin{columns}[T]
+\begin{column}{0.51\textwidth}
+\centering
+\textbf{Tier 2 Experiments, 1990--2024}\\[2pt]
+{\scriptsize
+\begin{tabular}{@{}ll@{}}
+\toprule
+Experiment & Design \\
+\midrule
+amip ensemble & all forcings, 3+ members \\
+amip-nudge & winds nudged to reanalysis \\
+amip-nat & solar, volcanic, orbital only \\
+amip-ghg & greenhouse gases only \\
+amip-aer & anthropogenic aerosol only \\
+amip-slcf & short-lived forcers only \\
+amip-sst & SST and sea-ice change only \\
+amip-noghg & all but greenhouse gases \\
+amip-noaer & all but aerosol \\
+piclim-histall & all forcings, 1850 SST \\
+\bottomrule
+\end{tabular}\\[4pt]
+Single-forcing runs: other inputs at 1850.\par}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{block}{Planned CESM3/CAM7 Runs}
+\begin{itemize}
+  \item Ensembles of 3--5 members,\\free and AOD-constrained
+  \item Aerosol-only and all-but-aerosol
+  \item Nudged winds: ERA5,\\as in the 2008 test run
+\end{itemize}
+\end{block}
+\begin{block}{What the Pairs Separate}
+\begin{itemize}
+  \item Free vs constrained:\\aerosol state or aerosol response
+  \item Ensemble: internal variability
+  \item All-VIIRS member, 2018--2024:\\the April 2022 imager seam
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}

@@ -1,0 +1,178 @@
+% Preamble — Berkeley/NCAR, matching the house style of
+% ~/DavidFillmore/Media/decks/agentic_ai (which in turn follows
+% ~/EarthSystem/CheMPAS-Slides/ceres_talk). Trimmed for this deck: no
+% beamerposter, no CLI transcript panels, no command badges.
+\documentclass[aspectratio=169]{beamer}
+% width=2.6cm (Berkeley default 2cm): the section names "AOD Constraints" and
+% "Band Properties" wrap at the default width.
+\usetheme[width=2.6cm]{Berkeley}
+\useinnertheme{default}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% Tectonic reads UTF-8 natively, so a literal em dash has no mapping into the
+% T1-encoded body font and is silently dropped ("Missing character"). inputenc
+% is a no-op on a unicode-native engine, so map it by catcode. Slide sources
+% here use `---` throughout; this is insurance against a pasted em dash.
+\catcode`\—=\active
+\def—{\textemdash}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds,
+                calc, decorations.pathreplacing, patterns}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Palette, symbolic seam, logo binding and graphics path.
+\input{colors}
+
+% --- Beamer chrome -------------------------------------------------------
+% Written against the symbolic seam (accent / accentSoft / accentDeep /
+% sidebarBg) rather than the literal ncar* names, so a future per-slide
+% recolor can redirect one frame: beamer stores the color NAME and resolves
+% it at typeset time, which a group-local \colorlet redirects.
+\setbeamercolor{structure}{fg=accent}
+\setbeamercolor{palette primary}{bg=accent, fg=white}
+\setbeamercolor{palette secondary}{bg=accentSoft, fg=white}
+\setbeamercolor{palette tertiary}{bg=accentDeep, fg=white}
+\setbeamercolor{palette quaternary}{bg=sidebarBg, fg=white}
+\setbeamercolor{frametitle}{bg=accent, fg=white}
+\setbeamercolor{sidebar}{bg=sidebarBg}
+\setbeamercolor{section in sidebar}{fg=accentSoft!30!white}
+\setbeamercolor{section in sidebar shaded}{fg=accentSoft}
+\setbeamerfont{section in sidebar}{series=\bfseries, size*={7.5pt}{8.4pt}}
+\setbeamerfont{section in sidebar shaded}{series=\mdseries, size*={7.5pt}{8.4pt}}
+\setbeamercolor{author in sidebar}{fg=white}
+\setbeamercolor{title in sidebar}{fg=white}
+% Sidebar = section nav only, starting at the top. Berkeley's stock template
+% stacks short title + short author + ~4em of glue above the nav; this
+% replacement drops all of it (emptying the short forms is not enough — the
+% glue stays).
+\makeatletter
+\setbeamertemplate{sidebar left}{%
+  \vskip0.5em%
+  \insertverticalnavigation{\beamer@sidebarwidth}%
+  \vfill
+}
+\makeatother
+\setbeamercolor{section in toc}{fg=accentSoft}
+\setbeamercolor{block title}{bg=accent, fg=white}
+\setbeamercolor{block body}{bg=ncarLightGray, fg=ncarSpace}
+\setbeamercolor{block title alerted}{bg=ncarOrange, fg=white}
+\setbeamercolor{block title example}{bg=accentSoft, fg=white}
+\setbeamercolor{item}{fg=accent}
+\setbeamercolor{subitem}{fg=accentSoft}
+\setbeamercolor{subsubitem}{fg=accentDeep}
+
+\setbeamertemplate{navigation symbols}{}
+
+% \fitline{<content>} — set <content> on one line within \linewidth, shrinking
+% only if it would otherwise wrap. Never enlarges. Every diagram on this deck
+% is wrapped in it, so the tikz coordinate extent is authored just under the
+% body column and the font sizes written there are what reach the slide.
+% No blank lines inside it: it measures with \settowidth, and a \par there
+% ends the measurement mid-box.
+\newlength{\fitlinewd}
+\newcommand{\fitline}[1]{%
+  \settowidth{\fitlinewd}{#1}%
+  \ifdim\fitlinewd>\linewidth
+    \resizebox{\linewidth}{!}{#1}%
+  \else
+    #1%
+  \fi
+}
+
+% \fitframe{<diagram>} — the workhorse every content frame uses.
+%
+% \fitline alone is not enough here. It constrains WIDTH only, so a diagram
+% authored just inside the column but too tall still overruns the page, and
+% beamer reports it as "Overfull \vbox" with the bottom of the slide silently
+% cropped. Each of these frames pairs a wide diagram with a wrapped text strip
+% whose height depends on how the prose happens to break — which is exactly
+% the kind of thing that shifts under a one-word edit.
+%
+% adjustbox's max size scales proportionally to fit BOTH bounds and leaves
+% anything already smaller untouched, so a frame can be edited freely and
+% still lands on the page. \bodyheight is the room left under the frametitle
+% bar.
+% NOTE ON TYPE SIZE. max size only ever shrinks, so any diagram authored
+% larger than the body box gets scaled DOWN and every font in it shrinks with
+% it — a \scriptsize label inside a picture scaled to 0.8 lands near 6 pt and
+% is unreadable projected. So frames are authored to fit at 1:1 (about 14 cm
+% wide, \bodyheight tall) and their labels start at \normalsize, never
+% smaller. If a frame needs shrinking to fit, cut content instead.
+%
+% \bodyheight is 6.50cm. The body region under the frametitle measures ~7.43cm
+% on paper but only ~6.5cm is actually usable — 7.00cm overran the page by
+% 0.47cm. Measured across the deck, the smallest achievable gap between the
+% frametitle bar and the first ink is ~0.49cm: that residue is beamer's own
+% frametitle padding, not slack in the picture, so do not chase it. Frames
+% measuring 0.9cm+ DO have reclaimable space. Beamer centres the picture in
+% what is left, so the balance is
+% frametitle: beamer centres the picture in that region, so the balance is
+% margin. It was 6.15cm, which was shrinking the three band frames (6.4 units
+% tall) to 0.96 and taking every font in them down with it.
+\usepackage{adjustbox}
+\newlength{\bodyheight}
+\setlength{\bodyheight}{6.50cm}
+\newcommand{\fitframe}[1]{\adjustbox{max size={\linewidth}{\bodyheight}}{#1}}
+
+% --- Molecular formulae --------------------------------------------------
+% \mgap is the gap inside a chemical formula. ONE rule, applied everywhere:
+% split a formula at the bonds BETWEEN chemically distinct moieties, and keep
+% each functional group tight.
+%
+%   split      Cl\mgap O\mgap NO$_2$    chlorine - oxygen - nitro
+%              H\mgap NO$_3$            proton - nitrate
+%              H\mgap CN                proton - cyanide
+%   tight      O$_3$  O$_2$  H$_2$O  CO$_2$  CO  CH$_4$  N$_2$O  NO$_2$
+%              N$_2$O$_5$
+%
+% Run together, ClONO$_2$ is genuinely hard to read when projected — "ClO"
+% scans as C-l-O — and the same applies to HNO$_3$ and HCN. N$_2$O$_5$ stays
+% tight because its conventional formula is not a concatenation of a distinct
+% atom and a group; splitting it would need the structural form O$_2$N-O-NO$_2$,
+% which is not what an audience expects to see. CFC-11 and CFC-12 are names,
+% not formulae.
+%
+% Routed through a macro so the convention is enforced in one place: widen or
+% narrow the gap here, not in fourteen call sites.
+\newcommand{\mgap}{\,}
+
+% \codepath{...} — typewriter formatting for path and dataset-version refs.
+\newcommand{\codepath}[1]{\texttt{\small #1}}
+
+% --- Link convention (deck-wide) -----------------------------------------
+% EVERY link renders as REGULAR TEXT, UNDERLINED. No color shift, no italics,
+% no beamer link box — the rule is the only affordance. Routed through a macro
+% so the convention is enforced by construction.
+\newcommand{\decklink}[2]{\href{#1}{\mbox{\underline{#2}}}}
+\hypersetup{colorlinks=false, pdfborder={0 0 0}}
+
+
+% \regpanel{<pdf>} — one regional daily time-series panel (656x296pt DAVINCI
+% plots, ~7pt margins so no trim), 0.48 of the column width so a 2x2 fits
+% under \bodyheight. Used by the per-region 2008 Test Run frames.
+\newcommand{\regpanel}[1]{\includegraphics[width=0.48\linewidth]{#1}}
+
+% \zonalpanel{<pdf>} — one annual zonal-mean latitude-pressure section
+% (656x368pt DAVINCI plots, ~7pt margins so no trim). Height-limited to
+% 3.1cm like \compmap (frames/07): at 0.48 of the column width these would
+% stand 3.4cm and two rows would overrun \bodyheight. Used by the 2008 Test
+% Run zonal frames (12b, 12c).
+\newcommand{\zonalpanel}[1]{\includegraphics[height=3.1cm]{#1}}
+
+% --- Bullet slides ---------------------------------------------------------
+% The intro slides (02-05) are beamer blocks of bullets, two columns. Stock
+% block padding plus \small wrapped bullets overran \bodyheight by 2-3cm, so
+% blocks are trimmed top and bottom and items sit closer together.
+% The trims go OUTSIDE the box (before block begin, after block end): put
+% inside, the negative space pulls the grey background up over the last
+% line of the body and the text spills below the box.
+\addtobeamertemplate{block begin}{\vspace{-0.3em}}{}
+\addtobeamertemplate{block end}{}{\vspace{-0.6em}}
+\setlength{\leftmargini}{1.1em}
+\setbeamertemplate{itemize/enumerate body begin}{\setlength{\itemsep}{0.05em}}

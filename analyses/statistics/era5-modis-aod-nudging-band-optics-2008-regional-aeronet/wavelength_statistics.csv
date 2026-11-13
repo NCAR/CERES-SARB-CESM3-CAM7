@@ -1,0 +1,5 @@
+band,cam_band_code,cam_wavelength_nm,aeronet_wavelength_nm,regions,paired_region_days,site_days,matched_hourly_pairs,mean_active_sites_per_region_day,aeronet_mean,cam7_mean,mean_bias,mean_absolute_error,rmse,correlation
+ultraviolet,SW02,340,340,12,3869,18376,124555,4.749548,0.383333,0.377678,-0.005655,0.094804,0.152668,0.863571
+visible,SW05,546,500,12,3872,18754,128249,4.843492,0.272673,0.226972,-0.045701,0.074425,0.118350,0.882813
+near_infrared,SW08,842,870,12,3757,21946,151752,5.841363,0.175342,0.134531,-0.040810,0.051571,0.079460,0.907874
+shortwave_infrared,SW11,1660,1640,10,2331,5513,36948,2.365079,0.103293,0.066667,-0.036627,0.048503,0.089846,0.878268

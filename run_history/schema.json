@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ceres-sarb-cam7:run-history:v1",
+  "title": "CERES-SARB-CAM7 run-history record",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "case_name",
+    "run_kind",
+    "execution_date",
+    "purpose",
+    "simulation",
+    "configuration",
+    "status",
+    "outputs",
+    "validation",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "case_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_kind": {
+      "enum": [
+        "cesm",
+        "offline",
+        "build"
+      ]
+    },
+    "execution_date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1
+    },
+    "simulation": {
+      "type": "object"
+    },
+    "configuration": {
+      "type": "object",
+      "required": [
+        "compset",
+        "resolution"
+      ]
+    },
+    "scheduler": {
+      "type": "object"
+    },
+    "status": {
+      "type": "object",
+      "required": [
+        "stage",
+        "model_outcome",
+        "summary"
+      ],
+      "properties": {
+        "stage": {
+          "enum": [
+            "prepared",
+            "queued",
+            "running",
+            "model-complete",
+            "structurally-complete",
+            "numeric-gates-passed",
+            "davinci-inspection-passed",
+            "scientifically-accepted",
+            "partial",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "model_outcome": {
+          "enum": [
+            "not-run",
+            "running",
+            "succeeded",
+            "failed",
+            "cancelled",
+            "partial"
+          ]
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "required": [
+        "primary"
+      ]
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "structural",
+        "numeric",
+        "davinci",
+        "science"
+      ]
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "recorded_at",
+        "sources"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

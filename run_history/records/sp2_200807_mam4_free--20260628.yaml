@@ -1,0 +1,66 @@
+schema_version: 1
+run_id: "sp2_200807_mam4_free--20260628"
+case_name: "sp2_200807_mam4_free"
+run_kind: "cesm"
+execution_date: "2026-06-28"
+purpose: "Full-month July 2008 free-running reference paired with the MODIS AOD-nudged case"
+simulation:
+  start_date: "2008-07-01"
+  end_date: "2008-08-01"
+  duration: "31 days"
+  output_cadence: "3 hours"
+configuration:
+  model: "CESM3 / CAM7"
+  compset: "F2000dev"
+  resolution: "f09_f09_mg17"
+  chemistry: "ghg_mam4"
+  aerosol: "MAM4"
+  case_setup_script: "scripts/setup_sp2_july2008_runs.sh"
+  executable: "/glade/derecho/scratch/fillmore/sp2_200807_mam4_modis/bld/cesm.exe"
+  features:
+    era5_met_nudging: false
+    modis_aod_nudging: false
+    band_optics: false
+scheduler:
+  system: "Derecho PBS"
+  job_id: "6581729.desched1"
+  submission_queue: "main"
+  tasks: 128
+  walltime_used: "00:49:18"
+  exit_status: 0
+status:
+  stage: "structurally-complete"
+  model_outcome: "succeeded"
+  completed_at: "2026-06-28T23:45:24-06:00"
+  summary: "Model and matching full-month reference output inventory completed; later paired gates are recorded in separate verification runs."
+outputs:
+  primary: "/glade/derecho/scratch/fillmore/sp2_200807_mam4_free/run"
+  case_dir: "/glade/work/fillmore/CESM3/cases/sp2_200807_mam4_free"
+  run_dir: "/glade/derecho/scratch/fillmore/sp2_200807_mam4_free/run"
+validation:
+  structural:
+    status: "passed"
+    checked_at: "2026-07-13"
+    summary: "h0a and h0i each contain 248 matching records; AODNDG fields are absent as expected."
+    metrics:
+      h0a_records: 248
+      h0i_records: 248
+      first_h0i_record: "20080701:10800"
+      last_h0i_record: "20080801:0"
+  numeric:
+    status: "not-recorded"
+    summary: "No standalone full-month numeric acceptance result is recorded for this free reference."
+  davinci:
+    status: "not-recorded"
+    summary: "No standalone DAVINCI run is registered for this free reference."
+  science:
+    status: "not-recorded"
+    summary: "Paired science gates are documented in separate short verification cases rather than this record."
+results:
+  - "Provides the free-running trajectory paired with the original July MODIS AOD-nudged case."
+provenance:
+  recorded_at: "2026-07-25T08:57:20-06:00"
+  sources:
+    - "RUN.md"
+    - "docs/HANDOFF.md"
+    - "/glade/work/fillmore/CESM3/cases/sp2_200807_mam4_free/CaseStatus"

@@ -1,0 +1,73 @@
+schema_version: 1
+run_id: "sp3_200803_mam4_modis_era5_optics_spinup10_v1--20260908"
+case_name: "sp3_200803_mam4_modis_era5_optics_spinup10_v1"
+run_kind: "cesm"
+execution_date: "2026-09-08"
+purpose: "2008-03 ERA5- and MODIS-nudged CAM7/MAM4 with ten-day spinup and SW/LW aerosol optics"
+simulation:
+  calendar: "NO_LEAP"
+  start_date: "2008-02-19"
+  analysis_start: "2008-03-01 00:00:00"
+  end_date: "2008-03-08"
+  end_time_utc: "2008-03-08 21:00:00"
+  duration: "429 model hours including ten-day spinup"
+  output_cadence: "3 hours; eight history records per file"
+  expected_history_records: 143
+  expected_analysis_records: 63
+  expected_optics_groups: 144
+  expected_optics_files: 3744
+configuration:
+  model: "CESM3 / CAM7"
+  compset: "F2000dev"
+  resolved_compset: "2000_CAM70_CLM60%SP_CICE%PRES_DOCN%DOM_MOSART_SGLC_SWAV_SESP"
+  resolution: "f09_f09_mg17"
+  chemistry: "ghg_mam4"
+  aerosol: "MAM4"
+  case_setup_script: "scripts/setup_monthly_2008_cases.py"
+  case_config: "config/cesm/monthly_2008_v1.yaml"
+  base_case: "/glade/work/fillmore/CESM3/cases/sp3_lut_build"
+  executable: "/glade/derecho/scratch/fillmore/sp3_lut_build/bld/cesm.exe"
+  executable_sha256: "e232b73691f4c80b9715a5f8cf31f6014352048cebb13d9618cc3466e0cdd7fd"
+  optics_method: "lut"
+  lut_file: "/glade/work/fillmore/Data/CERES-SARB-CAM7/optics/aod_lfl_lut_mam4_camref_dense3_20260709.nc"
+  features: {era5_met_nudging: true, modis_aod_nudging: true, band_optics: true}
+scheduler:
+  system: "Derecho PBS"
+  submission_queue: "main"
+  tasks: 128
+  memory_requested: "235 GB"
+  walltime_requested: "12:00:00"
+  job_id: "7355509.desched1"
+  submitted_at: "2026-09-09T00:50:06.547977+00:00"
+  scheduler_state: "Q"
+status:
+  stage: "queued"
+  model_outcome: "not-run"
+  summary: "Case submitted successfully and confirmed queued in Derecho PBS as 7355509.desched1."
+outputs:
+  primary: "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1/optics"
+  case_dir: "/glade/work/fillmore/CESM3/cases/sp3_200803_mam4_modis_era5_optics_spinup10_v1"
+  run_dir: "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1/run"
+  optics_dir: "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1/optics"
+validation:
+  structural: {status: "pending", summary: "Expected counts recorded; model has not run."}
+  numeric: {status: "pending", summary: "Awaiting model output and numeric verification."}
+  davinci: {status: "pending", summary: "Awaiting post-model analysis."}
+  science: {status: "pending", summary: "Awaiting numeric and visual scientific checks."}
+results:
+  - "CIME submission succeeded and Derecho PBS reported job 7355509.desched1 in queued state."
+  - "Forcing coverage, generated namelists, input-data check, batch preview, and shared-build compatibility passed."
+  - "Analysis excludes ten model days of spinup; both meteorological and AOD nudging operate during spinup."
+  - "March stops at 2008-03-08 21:00 UTC to avoid ERA5 look-ahead into the March 9-10 gap; March 8 is partial."
+provenance:
+  recorded_at: "2026-09-09T00:52:15+00:00"
+  sources:
+    - "docs/monthly-2008-case-plan.md"
+    - "config/cesm/monthly_2008_v1.yaml"
+    - "/glade/work/fillmore/CESM3/cases/sp3_200803_mam4_modis_era5_optics_spinup10_v1/CaseStatus"
+    - "/glade/work/fillmore/CESM3/cases/sp3_200803_mam4_modis_era5_optics_spinup10_v1/CaseDocs/atm_in"
+    - "/glade/work/fillmore/Data/CERES-SARB-CAM7/logs/case_configuration/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1.log"
+    - "/glade/work/fillmore/Data/CERES-SARB-CAM7/logs/case_configuration/monthly_2008_v1/configuration-summary.json"
+    - "/glade/work/fillmore/Data/CERES-SARB-CAM7/logs/case_configuration/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1.storage-reconfigure.log"
+    - "/glade/work/fillmore/Data/CERES-SARB-CAM7/logs/case_configuration/monthly_2008_v1/sp3_200803_mam4_modis_era5_optics_spinup10_v1.submit.log"
+    - "/glade/work/fillmore/Data/CERES-SARB-CAM7/logs/case_configuration/monthly_2008_v1/submission-summary.json"

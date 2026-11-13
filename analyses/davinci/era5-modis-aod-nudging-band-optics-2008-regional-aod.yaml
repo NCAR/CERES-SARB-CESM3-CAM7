@@ -1,0 +1,269 @@
+analysis:
+  start_time: "2008-01-01T00:00:00"
+  end_time: "2008-12-31T23:59:59"
+  output_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-regional-aod
+  log_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-regional-aod/logs
+  domain: global
+  style:
+    theme: ncar
+    context: publication
+
+# scripts/prepare_2008_regional_aod.py computes cosine-latitude-weighted means
+# from the twelve accepted monthly 0.546 µm AOD products. These source names
+# and bounds are the DAVINCI aerosol_region catalog, based on the 12 global AOT
+# evaluation zones in https://doi.org/10.5194/gmd-11-2333-2018 (Table 1).
+sources:
+  north_atlantic_ocean:
+    type: generic
+    display_name: North Atlantic Ocean
+    files: &regional_product /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/era5-modis-aod-nudging-band-optics-2008-regional-aod/products/regional_aod/analysis.nc
+    variables:
+      aod:
+        source_name: north_atlantic_ocean
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  south_atlantic_ocean:
+    type: generic
+    display_name: South Atlantic Ocean
+    files: *regional_product
+    variables:
+      aod:
+        source_name: south_atlantic_ocean
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  north_indian_ocean:
+    type: generic
+    display_name: North Indian Ocean
+    files: *regional_product
+    variables:
+      aod:
+        source_name: north_indian_ocean
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  north_africa:
+    type: generic
+    display_name: North Africa (Sahara)
+    files: *regional_product
+    variables:
+      aod:
+        source_name: north_africa
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  southern_africa:
+    type: generic
+    display_name: Southern Africa
+    files: *regional_product
+    variables:
+      aod:
+        source_name: southern_africa
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  eastern_us:
+    type: generic
+    display_name: Eastern US
+    files: *regional_product
+    variables:
+      aod:
+        source_name: eastern_us
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  western_us:
+    type: generic
+    display_name: Western US
+    files: *regional_product
+    variables:
+      aod:
+        source_name: western_us
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  canada:
+    type: generic
+    display_name: Canada
+    files: *regional_product
+    variables:
+      aod:
+        source_name: canada
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  south_america:
+    type: generic
+    display_name: South America
+    files: *regional_product
+    variables:
+      aod:
+        source_name: south_america
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  middle_east:
+    type: generic
+    display_name: Middle East
+    files: *regional_product
+    variables:
+      aod:
+        source_name: middle_east
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  east_asia:
+    type: generic
+    display_name: East Asia
+    files: *regional_product
+    variables:
+      aod:
+        source_name: east_asia
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+  india:
+    type: generic
+    display_name: India
+    files: *regional_product
+    variables:
+      aod:
+        source_name: india
+        units: "1"
+        display_name: Visible Aerosol Optical Depth
+        style_preset: geosit_aod
+
+plot_suites: {}
+
+plots:
+  north_atlantic_ocean_aod:
+    type: timeseries
+    source: north_atlantic_ocean
+    variable: aod
+    title: North Atlantic Ocean Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  south_atlantic_ocean_aod:
+    type: timeseries
+    source: south_atlantic_ocean
+    variable: aod
+    title: South Atlantic Ocean Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  north_indian_ocean_aod:
+    type: timeseries
+    source: north_indian_ocean
+    variable: aod
+    title: North Indian Ocean Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  north_africa_aod:
+    type: timeseries
+    source: north_africa
+    variable: aod
+    title: North Africa (Sahara) Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  southern_africa_aod:
+    type: timeseries
+    source: southern_africa
+    variable: aod
+    title: Southern Africa Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  eastern_us_aod:
+    type: timeseries
+    source: eastern_us
+    variable: aod
+    title: Eastern US Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  western_us_aod:
+    type: timeseries
+    source: western_us
+    variable: aod
+    title: Western US Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  canada_aod:
+    type: timeseries
+    source: canada
+    variable: aod
+    title: Canada Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  south_america_aod:
+    type: timeseries
+    source: south_america
+    variable: aod
+    title: South America Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  middle_east_aod:
+    type: timeseries
+    source: middle_east
+    variable: aod
+    title: Middle East Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  east_asia_aod:
+    type: timeseries
+    source: east_asia
+    variable: aod
+    title: East Asia Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+  india_aod:
+    type: timeseries
+    source: india
+    variable: aod
+    title: India Visible AOD
+    output_subdir: plots/regions
+    formats: [pdf]
+
+  dust_and_continental_aod:
+    type: timeseries
+    sources:
+      - {source: north_africa, variable: aod}
+      - {source: middle_east, variable: aod}
+      - {source: india, variable: aod}
+      - {source: east_asia, variable: aod}
+    title: "Dust and Continental Aerosol Regions: Visible AOD"
+    output_subdir: plots/comparisons
+    formats: [pdf]
+  biomass_burning_aod:
+    type: timeseries
+    sources:
+      - {source: southern_africa, variable: aod}
+      - {source: south_america, variable: aod}
+      - {source: canada, variable: aod}
+    title: "Biomass-Burning Regions: Visible AOD"
+    output_subdir: plots/comparisons
+    formats: [pdf]
+  north_american_aod:
+    type: timeseries
+    sources:
+      - {source: eastern_us, variable: aod}
+      - {source: western_us, variable: aod}
+      - {source: canada, variable: aod}
+    title: "North American Regions: Visible AOD"
+    output_subdir: plots/comparisons
+    formats: [pdf]
+  ocean_transport_aod:
+    type: timeseries
+    sources:
+      - {source: north_atlantic_ocean, variable: aod}
+      - {source: south_atlantic_ocean, variable: aod}
+      - {source: north_indian_ocean, variable: aod}
+    title: "Ocean Transport Regions: Visible AOD"
+    output_subdir: plots/comparisons
+    formats: [pdf]
+
+pairs: {}
+
+inspection:
+  enabled: true
+  required: true
+  presets: []
+  preview_format: png

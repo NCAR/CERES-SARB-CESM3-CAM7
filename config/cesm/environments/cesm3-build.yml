@@ -1,0 +1,21 @@
+name: cesm3-build
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - gcc=15.2
+  - gxx=15.2
+  - gfortran=15.2
+  - openmpi=5.0.10
+  - esmf=8.9.1=mpi_openmpi_h9fe2139_4
+  - "hdf5=2.2.0=mpi_openmpi_*"
+  - "libnetcdf=4.10.1=mpi_openmpi_*"
+  - "netcdf-fortran=4.6.3=mpi_openmpi_*"
+  - "libpnetcdf=1.15.0=mpi_openmpi_*"
+  - "parallelio=2.6.9=mpi_openmpi_*"
+  - cmake=4.4
+  - make=4.4
+  - m4=1.4
+  - pkg-config
+  - libblas=3.11
+  - liblapack=3.11

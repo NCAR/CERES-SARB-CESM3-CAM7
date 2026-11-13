@@ -14,6 +14,45 @@ covering the recipient's simulation dates, together with the namelist settings
 below. The separate LW omega/g table is only needed for the remapping method
 with prescribed LW scattering.
 
+Start with the [documentation index](docs/README.md) for installation,
+tropospheric scaling, the paired test and vertical layer-AOD profiles.
+
+## Tropospheric scaling branch
+
+Branch `feature/tropospheric-aod-nudging` mirrors the scientific code, tests,
+technical documentation, analysis configurations and validation results from
+the private project's matching branch at commit
+`06628de7f4cf65af192e1dd3249f15a1368dc36b`. The synchronized file inventory is
+in [`docs/upstream-sync.json`](docs/upstream-sync.json). The original project
+workflow is preserved in [`UPSTREAM-WORKFLOW.md`](UPSTREAM-WORKFLOW.md);
+the recipient installation instructions below remain the entry point for
+adapting the code to another CESM checkout or account.
+
+```bash
+git fetch origin
+git switch feature/tropospheric-aod-nudging
+```
+
+The new namelist setting is:
+
+```fortran
+aod_nudge_on = .true.
+aod_tropo_only = .true.
+```
+
+`aod_tropo_only = .false.` is the default and retains whole-column scaling.
+With the option enabled, only levels strictly below CAM's diagnosed
+tropopause are scaled. CAM's native TWMO temperature-lapse-rate diagnostic
+finds the boundary, using its climatological fallback when needed. The
+diagnosed tropopause layer and all layers above it are excluded. The target
+for the eligible layers is the observed column AOD minus the excluded model
+AOD; the existing ratio bounds and low-AOD guard still apply.
+
+The [method and original validation](docs/tropospheric-scaling.md) and
+[recipient on/off test protocol](docs/tropospheric-testing.md) describe the
+diagnostics and vertical layer-AOD plots. Keep `aod_nudge_on = .true.` in
+both comparison runs and change only `aod_tropo_only`.
+
 ## Supported configuration
 
 - **CAM7 physics**, with the original integration based on CESM
@@ -37,9 +76,11 @@ with prescribed LW scattering.
   from CAM; this extension does not impose the original cases' L32 choice.
 
 The AOD constraint scales interstitial aerosol mass and number, with matching
-aerosol-water/number buffers, by a column-wide observation/model ratio before
-radiation. It runs on shortwave-radiation timesteps. The default ratio bounds
-are 0.1 to 10, and model AOD below 0.01 is left unchanged. Keep
+aerosol-water/number buffers, before radiation. Whole-column mode uses an
+observation/model column ratio; tropospheric mode uses the residual target and
+eligible-layer AOD described above. It runs on shortwave-radiation timesteps.
+The default ratio bounds are 0.1 to 10, and eligible model AOD below 0.01 is
+left unchanged (total model AOD in whole-column mode). Keep
 `aod_aci_on = .false.`: the cloud-borne scaling option is not implemented and
 aborts if enabled.
 
@@ -145,11 +186,11 @@ edges are built into `aod_optics_bands.F90`. Leave `aod_optics_band_file = ''`.
 The normal CAM aerosol/radiation input files remain part of the recipient's
 CESM input-data requirements. The extra LUT does not replace them.
 
-The table-generation Python code and its Mie/optical-property dependencies
-remain in the original project; they are not needed to run CAM with the
-precomputed table. Changing emission inventories alone does not require
-regenerating the LUT when the aerosol species and mode properties remain
-compatible.
+The mirrored table-generation Python code is under `sp3_optics/`; its external
+Mie/optical-property dependencies are described in the upstream workflow.
+Neither is needed to run CAM with the precomputed table. Changing emission
+inventories alone does not require regenerating the LUT when the aerosol
+species and mode properties remain compatible.
 
 ## AOD observation inputs
 
@@ -157,7 +198,9 @@ The recipient must also supply CAM-readable target AOD files covering the
 simulation dates, including the bracketing observation windows at the run
 boundaries. Raw MODIS/VIIRS retrieval files cannot be read directly by these
 Fortran modules. Observation acquisition and preprocessing are outside this
-repository.
+repository's Fortran runtime. The scientific mirror also includes the original
+`sp1_aod_pipeline/` preprocessing code and its configurations; see
+[`UPSTREAM-WORKFLOW.md`](UPSTREAM-WORKFLOW.md) for that separate workflow.
 
 The default input series uses eight three-hour windows per day:
 
@@ -196,9 +239,9 @@ the reader concatenates it directly with the filename.
    merge the same changes manually if the target version differs. For a
    compatible, unpatched checkout, the commands below check every patch before
    applying them together.
-4. Merge the 19 definition entries whose group is `aod_nudging_nl` or
+4. Merge the 20 definition entries whose group is `aod_nudging_nl` or
    `aod_optics_nl` from the supplied definition XML into the recipient's CAM
-   definition XML. Merge the 18 `aod_*` defaults from the supplied defaults XML
+   definition XML. Merge the 19 `aod_*` defaults from the supplied defaults XML
    into the recipient's defaults XML. `aod_obs_path` is supplied by the user
    and has no XML default. Avoid duplicating existing entries.
 5. Add the settings below to the recipient's `user_nl_cam`, run
@@ -236,6 +279,7 @@ Use assignments without enclosing namelist group delimiters; CAM's
 ```fortran
 ! AOD observations on the exact f09 grid.
 aod_nudge_on = .true.
+aod_tropo_only = .false. ! true restricts scaling to layers below the tropopause
 aod_obs_path = '/path/to/AOD_f09_3hr/'
 aod_obs_template = 'MODIS_VIIRS_AOD_3hr_f09.%y%m%d.%s.nc'
 aod_times_per_day = 8

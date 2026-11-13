@@ -1,0 +1,62 @@
+{
+  "model": "cam7",
+  "repository": "/glade/work/fillmore/CERES-SARB-CAM7",
+  "cesm_root": "/glade/work/fillmore/CESM3/cesm3_0_beta08",
+  "cesm_commit": "8ce857e8ba55bf7aeca11d93562e36abd635e5a0",
+  "cam_commit": "da38e55454ee870107addf6a157c0d67bc2f7978",
+  "base_case": "/glade/work/fillmore/CESM3/cases/ceresmip_b08_f09_era5_modis_y2008_su3m",
+  "base_user_nl_sha256": "c84ab722c38a796791cde6abfa7407a5058276d91789fbe8cfa3157f8d93ad56",
+  "case_root": "/glade/work/fillmore/CESM3/cases",
+  "output_root": "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/tropospheric-july2008-v1",
+  "data_root": "/glade/work/fillmore/Data/CERES-SARB-CAM7",
+  "start_date": "2008-06-21",
+  "stop_date": "2008-08-01",
+  "duration_days": 41,
+  "spinup_days": 10,
+  "calendar": "NO_LEAP",
+  "analysis_start": "2008-07-01T00:00:00",
+  "analysis_end": "2008-07-31T23:59:59",
+  "project": "P19010000",
+  "tasks": 128,
+  "threads": 1,
+  "queue": "main",
+  "walltime": "03:00:00",
+  "memory": "128GB",
+  "build_jobs": 16,
+  "build_memory": "64GB",
+  "build_walltime": "01:00:00",
+  "python": "/glade/work/fillmore/miniforge3/envs/pace-daaq-py311/bin/python",
+  "observation_root": "/glade/work/fillmore/Data/CERES-SARB-CAM6/inputs/modis_c7_l2_200004_202203_f09_3hr_gls_rho05",
+  "observation_template": "%y/%m/%d/MODIS_VIIRS_AOD_3hr_f09.%y%m%d.%s.nc",
+  "tropopause": "CAM native TWMO with climatology fallback; eligible k > tropLev; boundary held fixed within update",
+  "ratio": "clamp(max(observed - fixed_AOD, 0) / eligible_AOD, 0.1, 10); skip eligible_AOD < 0.01",
+  "comparison": "Matched whole-column and tropospheric-only runs from identical initialization and forcing; existing archived results retained as secondary AOD context.",
+  "source_policy": "New source and namelist overlays only in these cases; original model checkouts and completed cases remain untouched.",
+  "cases": {
+    "tropo": {
+      "name": "cam7_200807_modis_tropo_v1",
+      "path": "/glade/work/fillmore/CESM3/cases/cam7_200807_modis_tropo_v1",
+      "rundir": "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/tropospheric-july2008-v1/cam7_200807_modis_tropo_v1/run",
+      "aod_tropo_only": true
+    },
+    "column": {
+      "name": "cam7_200807_modis_column_v1",
+      "path": "/glade/work/fillmore/CESM3/cases/cam7_200807_modis_column_v1",
+      "rundir": "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/tropospheric-july2008-v1/cam7_200807_modis_column_v1/run",
+      "aod_tropo_only": false
+    }
+  },
+  "exeroot": "/glade/derecho/scratch/fillmore/CERES-SARB-CAM7/tropospheric-july2008-v1/cam7_200807_modis_tropo_v1/bld",
+  "scheduler_note": "Jobs first submitted to develop, then moved to main routing (cpu execution) to avoid serializing the two model pairs at the development queue per-user CPU limit.",
+  "base_source_files_sha256": {
+    "aod_nudging_obs.F90": "44a6ba49b5bc9ea8621a1599ad6e6bbac21cbe57fa253b4326a04b0247c5ceff"
+  },
+  "creation_method": "create_clone",
+  "compset_long_name": "HIST_CAM70_CLM60%SP_CICE%PRES_DOCN%DOM_MOSART_SGLC_SWAV_SESP",
+  "resolution": "f09_f09_mg17",
+  "machine": "derecho",
+  "compiler": "intel",
+  "mpilib": "mpich",
+  "levels": 32,
+  "aerosol": "MAM4"
+}

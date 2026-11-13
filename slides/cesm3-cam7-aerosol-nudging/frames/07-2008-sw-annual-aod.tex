@@ -1,0 +1,20 @@
+% 07-2008-sw-annual-aod — 2008 Test Run: annual column AOD in the four
+% shortwave bands, 2x2. Source: DAVINCI composites
+% (analyses/davinci/era5-modis-aod-nudging-band-optics-2008-composites.yaml),
+% copied under graphics/2008-composites/.
+%
+% Each map is 576x360pt with at least 6/35/28/36pt of white margin (l/b/r/t)
+% across the set (the asymmetry colorbar labels reach 28pt from the right;
+% the SSA titles 36pt from the top); the
+% trim keeps the title and colorbar. Panels are height-limited: 3.1cm each
+% so two rows fit under \bodyheight (6.5cm).
+\newcommand{\compmap}[1]{\includegraphics[trim=4 30 24 32, clip, height=3.1cm]{#1}}
+\begin{frame}[t]
+\frametitle{2008 Annual Column AOD by Shortwave Band}
+\centering
+\compmap{2008-composites/shortwave/ultraviolet/ultraviolet_optics_ultraviolet_column_aod_Annual.pdf}\hfill
+\compmap{2008-composites/shortwave/visible/visible_optics_visible_column_aod_Annual.pdf}\par
+\vspace{0.15cm}
+\compmap{2008-composites/shortwave/near-infrared/near_infrared_optics_near_infrared_column_aod_Annual.pdf}\hfill
+\compmap{2008-composites/shortwave/shortwave-infrared/shortwave_infrared_optics_shortwave_infrared_column_aod_Annual.pdf}\par
+\end{frame}

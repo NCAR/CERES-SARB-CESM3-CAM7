@@ -1,0 +1,75 @@
+schema_version: 1
+run_id: "sp2_200807_mam4_modis_era5--20260723"
+case_name: "sp2_200807_mam4_modis_era5"
+run_kind: "cesm"
+execution_date: "2026-07-23"
+purpose: "Full-month July 2008 CAM7 run with ERA5 meteorological and MODIS AOD nudging"
+simulation:
+  start_date: "2008-07-01"
+  end_date: "2008-08-01"
+  duration: "31 days"
+  output_cadence: "3 hours"
+configuration:
+  model: "CESM3 / CAM7"
+  compset: "F2000dev"
+  resolution: "f09_f09_mg17"
+  chemistry: "ghg_mam4"
+  aerosol: "MAM4"
+  case_setup_script: "scripts/setup_sp2_july2008_era5_modis_run.sh"
+  features:
+    era5_met_nudging: true
+    modis_aod_nudging: true
+    band_optics: false
+scheduler:
+  system: "Derecho PBS"
+  job_id: "6870141.desched1"
+  submission_queue: "main"
+  execution_queue: "cpu"
+  tasks: 128
+  memory_requested: "235 GB"
+  memory_used: "78205600kb"
+  walltime_used: "00:55:57"
+  started_at: "2026-07-23T20:46:40-06:00"
+  finished_at: "2026-07-23T21:42:58-06:00"
+  exit_status: 0
+status:
+  stage: "structurally-complete"
+  model_outcome: "succeeded"
+  completed_at: "2026-07-23T21:42:37-06:00"
+  summary: "Model and structural output checks completed; DAVINCI passed, while a formal guard-aware numeric gate was not recorded."
+outputs:
+  primary: "/glade/derecho/scratch/fillmore/sp2_200807_mam4_modis_era5/run"
+  case_dir: "/glade/work/fillmore/CESM3/cases/sp2_200807_mam4_modis_era5"
+  run_dir: "/glade/derecho/scratch/fillmore/sp2_200807_mam4_modis_era5/run"
+  davinci_run_dir: "/glade/work/fillmore/Data/CERES-SARB-CAM7/runs/cam-aod-era5-modis-monthly-analysis-july-2008"
+validation:
+  structural:
+    status: "passed"
+    checked_at: "2026-07-24"
+    summary: "All ERA5/AOD inputs were present and the CAM output contains 248 three-hourly AOD analysis records through the boundary."
+    metrics:
+      era5_hourly_files: 745
+      aod_files: 248
+      h0i_records: 248
+      last_h0i_record: "20080801:0"
+  numeric:
+    status: "not-recorded"
+    summary: "The historical record does not include a formal guard-aware full-month numeric checker result."
+  davinci:
+    status: "passed"
+    checked_at: "2026-07-24"
+    summary: "Daily and monthly CAM AOD products completed with passing automated inspection."
+    config: "analyses/davinci/cam-aod-era5-modis-monthly-analysis-july-2008.yaml"
+    plot_count: 192
+    inspection_passed: true
+  science:
+    status: "not-recorded"
+    summary: "No separate visual scientific-acceptance decision is recorded in the structured ledger."
+results:
+  - "The case provides the production ERA5-constrained AOD analysis without three-dimensional band-optics output."
+provenance:
+  recorded_at: "2026-07-25T08:57:20-06:00"
+  sources:
+    - "RUN.md"
+    - "/glade/work/fillmore/CESM3/cases/sp2_200807_mam4_modis_era5/CaseStatus"
+    - "qstat -xf 6870141.desched1"

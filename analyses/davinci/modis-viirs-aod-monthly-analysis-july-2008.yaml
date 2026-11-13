@@ -1,0 +1,89 @@
+analysis:
+  start_time: "2008-07-01T00:00:00"
+  end_time: "2008-08-01T00:00:00"
+  output_dir: /glade/work/fillmore/Data/CERES-SARB-CAM7/runs/modis-viirs-aod-monthly-analysis-july-2008
+  domain: global
+  style:
+    theme: ncar
+    context: publication
+
+sources:
+  modis_viirs_gridded_aod:
+    type: generic
+    display_name: MODIS VIIRS Gridded AOD
+    files: /glade/work/fillmore/Data/CERES-SARB-CAM7/AOD_f09_3hr/MODIS_VIIRS_AOD_3hr_f09.200807*.nc
+    combine: nested
+    concat_dim: time
+    parallel: false
+    variables:
+      aod_weighted_mean:
+        units: "1"
+        valid_min: 0.0
+        valid_max: 5.0
+        nan_value: -999.0
+        display_name: Observation AOD
+        style_preset: geosit_aod
+      aod_uncertainty:
+        units: "1"
+        valid_min: 0.0
+        valid_max: 5.0
+        nan_value: -999.0
+        display_name: AOD Uncertainty
+      aod_count:
+        units: "1"
+        valid_min: 0.0
+        display_name: Observation Count
+
+analyses:
+  monthly_aod:
+    type: gridded_analysis
+    source: modis_viirs_gridded_aod
+    groupby: month
+    roles:
+      observation: aod_weighted_mean
+      uncertainty: aod_uncertainty
+      count: aod_count
+    fields:
+      observation_aod:
+        formula: 'weighted_mean(observation, count, dim="time")'
+        units: "1"
+        long_name: Monthly count-weighted MODIS and VIIRS AOD at 550 nm
+        display_name: Observation AOD
+        style_preset: geosit_aod
+      observation_uncertainty_aod:
+        formula: 'weighted_mean(uncertainty, count, dim="time")'
+        units: "1"
+        long_name: Monthly count-weighted AOD uncertainty
+        display_name: Observation AOD Uncertainty
+      observation_count:
+        formula: 'sum(count, dim="time")'
+        units: "1"
+        long_name: Monthly valid MODIS and VIIRS L2 observation count
+        display_name: Observation Count
+      observation_fraction:
+        formula: 'fraction(count > 0, dim="time")'
+        units: "1"
+        long_name: Monthly fraction of 3-hour windows with valid MODIS or VIIRS observations
+        display_name: Observation Fraction
+    output_group: monthly_modis_viirs_aod
+
+plot_suites:
+  monthly_aod:
+    preset: gridded_aod_diagnostics
+    source: monthly_aod
+    group: monthly
+    output_subdir: plots/monthly-modis-viirs-aod
+    overrides:
+      show_global_mean: true
+      tight_layout: true
+      tight_layout_pad: 0.5
+
+plots: {}
+pairs: {}
+
+inspection:
+  enabled: true
+  required: true
+  presets:
+    - gridded_aod_diagnostics
+  preview_format: png

@@ -1,0 +1,43 @@
+% 02-cesm3-cam7 — "CESM3/CAM7". \section = \frametitle: each titled slide gets its own
+% section so the Berkeley sidebar lists the deck by slide title.
+% Science-level configuration only (no code identifiers). Facts: SPEC.md,
+% docs/monthly-2008-case-plan.md, RUN.md "Met nudging".
+\section{CESM3/CAM7}
+\begin{frame}[t]
+\frametitle{CESM3/CAM7}
+\footnotesize
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}
+\begin{block}{Model}
+\begin{itemize}
+  \item CESM3 beta08, CAM7 physics,\\RRTMGP radiation
+  \item MAM4 modal aerosols (four modes)
+  \item Compset F2000dev: year-2000 forcing,\\prescribed SST and sea ice
+  \item f09 ($0.9^\circ \times 1.25^\circ$), 32 levels
+\end{itemize}
+\end{block}
+\begin{block}{Constraints}
+\begin{itemize}
+  \item Meteorology: hourly ERA5 winds,\\temperature and humidity
+  \item Aerosol: 3-hourly MODIS AOD\\at 550 nm
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.49\textwidth}
+\begin{block}{2008 Test Run}
+\begin{itemize}
+  \item Twelve monthly cases,\\10-day spin-up each
+  \item 3-hourly history and band optics
+  \item Derecho, one node per case
+\end{itemize}
+\end{block}
+\begin{block}{Additions to CAM7}
+\begin{itemize}
+  \item AOD constraint applied\\before each radiation call
+  \item 3-D aerosol optics written\\in the 26 SARB bands
+  \item Off by default;\\otherwise unmodified CAM7
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}

@@ -1,0 +1,105 @@
+schema_version: 1
+run_id: "sp3_200807_mam4_modis_era5_optics--20260724"
+case_name: "sp3_200807_mam4_modis_era5_optics"
+run_kind: "cesm"
+execution_date: "2026-07-24"
+purpose: "Full-month July 2008 ERA5- and MODIS-nudged CAM7 run with three-dimensional SW/LW aerosol optics"
+simulation:
+  start_date: "2008-07-01"
+  end_date: "2008-08-01"
+  duration: "31 days"
+  output_cadence: "3 hours"
+configuration:
+  model: "CESM3 / CAM7"
+  compset: "F2000dev"
+  resolution: "f09_f09_mg17"
+  chemistry: "ghg_mam4"
+  aerosol: "MAM4"
+  case_setup_script: "scripts/setup_sp3_july2008_era5_modis_optics_run.sh"
+  executable: "/glade/derecho/scratch/fillmore/sp3_lut_build/bld/cesm.exe"
+  optics_method: "lut"
+  lut_file: "/glade/work/fillmore/Data/CERES-SARB-CAM7/optics/aod_lfl_lut_mam4_camref_dense3_20260709.nc"
+  features:
+    era5_met_nudging: true
+    modis_aod_nudging: true
+    band_optics: true
+scheduler:
+  system: "Derecho PBS"
+  job_id: "6889504.desched1"
+  submission_queue: "main"
+  execution_queue: "cpu"
+  tasks: 128
+  memory_requested: "235 GB"
+  memory_used: "182152332kb"
+  walltime_used: "01:42:47"
+  started_at: "2026-07-24T23:26:11-06:00"
+  finished_at: "2026-07-25T01:09:36-06:00"
+  exit_status: 0
+status:
+  stage: "structurally-complete"
+  model_outcome: "succeeded"
+  completed_at: "2026-07-25T01:08:57-06:00"
+  summary: "Model, structural, guard-aware AOD, and full optics-invariant checks passed; the checked-in AOD verifier and dedicated DAVINCI optics analysis remain open."
+outputs:
+  primary: "/glade/derecho/scratch/fillmore/sp3_200807_mam4_modis_era5_optics/optics"
+  case_dir: "/glade/work/fillmore/CESM3/cases/sp3_200807_mam4_modis_era5_optics"
+  run_dir: "/glade/derecho/scratch/fillmore/sp3_200807_mam4_modis_era5_optics/run"
+  optics_dir: "/glade/derecho/scratch/fillmore/sp3_200807_mam4_modis_era5_optics/optics"
+  preserved_copy: "/glade/work/fillmore/Data/CERES-SARB-CAM7/model_output/preserved/sp3_200807_mam4_modis_era5_optics_no_spinup_20260724"
+validation:
+  structural:
+    status: "passed"
+    checked_at: "2026-07-25"
+    summary: "CAM and SP3 inventories match the complete full-July requirements with no missing timestamps or bands."
+    metrics:
+      h0i_records: 248
+      optics_files: 6474
+      optics_groups: 249
+      bands_per_group: 26
+      first_optics_stamp: "20080701.00000"
+      last_optics_stamp: "20080801.00000"
+  numeric:
+    status: "blocked"
+    checked_at: "2026-07-25"
+    summary: "Full SP3 invariants and a guard-aware AOD scan pass, but the checked-in SP2 verifier does not implement configured epsilon/clamp semantics."
+    checks:
+      - name: "full-sp3-physical-invariants"
+        status: "passed"
+        metrics:
+          files: 6474
+          max_extinction: 5.302906036376953
+          max_scattering: 5.2935662269592285
+          max_scattering_minus_extinction: 0.0
+          max_abs_asymmetry: 0.9589154720306396
+      - name: "guard-aware-full-month-aod"
+        status: "passed"
+        metrics:
+          active_cells: 2363991
+          guarded_pre_le_eps: 6435
+          clamp_low_cells: 4883
+          clamp_high_cells: 182
+          bad_active_cells: 0
+          bad_inactive_cells: 0
+      - name: "sp2_tests/check_integration.py"
+        status: "blocked"
+        details: "The checker compares POST directly with observations and flags expected guarded/clamped cells."
+  davinci:
+    status: "pending"
+    summary: "No dedicated full-month DAVINCI analysis YAML or output directory exists for this optics case."
+  science:
+    status: "pending"
+    summary: "Visual scientific inspection awaits the dedicated DAVINCI post-processing run."
+results:
+  - "PBS and CIME completed successfully."
+  - "All 14 SW and 12 LW bands passed the full-field physical-invariant scan."
+  - "The no-spin-up July output was copied out of scratch on 2026-09-08: all 6,712 files and 189,694,012,393 bytes matched the source inventory, and a dry-run rsync reported zero differences; the scratch source was retained."
+  - "RUN.md still labels this completed case as queued."
+provenance:
+  recorded_at: "2026-07-25T08:57:20-06:00"
+  sources:
+    - "RUN.md"
+    - "/glade/work/fillmore/CESM3/cases/sp3_200807_mam4_modis_era5_optics/CaseStatus"
+    - "qstat -xf 6889504.desched1"
+    - "skills/closeout-ceres-runs/scripts/summarize_ceres_case.py"
+    - "sp3_tests/check_sp3_outputs.py"
+    - "/glade/work/fillmore/Data/CERES-SARB-CAM7/model_output/preserved/sp3_200807_mam4_modis_era5_optics_no_spinup_20260724"

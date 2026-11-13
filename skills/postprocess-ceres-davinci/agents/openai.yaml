@@ -1,0 +1,4 @@
+interface:
+  display_name: "CERES Postprocess with DAVINCI"
+  short_description: "Submit and verify CERES DAVINCI via PBS"
+  default_prompt: "Use $postprocess-ceres-davinci to submit this CERES analysis through PBS, verify the deliverables, and update its run-history record."

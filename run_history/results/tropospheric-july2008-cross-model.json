@@ -1,0 +1,112 @@
+{
+  "weights": "CAM7 native FV latitude weights (gw)",
+  "models": {
+    "cam6": {
+      "column_global_mean_AOD": 0.17947168429524232,
+      "tropospheric_global_mean_AOD": 0.17482068685480284,
+      "AOD_bias_tropospheric_minus_column": -0.004650997440439457,
+      "AOD_spatial_RMSE": 0.02455532929138042,
+      "protected_layer_mass_increment_column": 1.498647361586336e-05,
+      "protected_layer_mass_increment_tropospheric": 0.0,
+      "protected_layer_number_increment_column": 3462389432320.0,
+      "protected_layer_number_increment_tropospheric": 0.0,
+      "interpretation": "Zero direct protected-layer increment does not require identical stratospheric profiles between trajectories: transport, physics, and a moving tropopause can create later differences."
+    },
+    "cam7": {
+      "column_global_mean_AOD": 0.18910808013956049,
+      "tropospheric_global_mean_AOD": 0.18856361202805008,
+      "AOD_bias_tropospheric_minus_column": -0.0005444681115103814,
+      "AOD_spatial_RMSE": 0.006507024755408758,
+      "protected_layer_mass_increment_column": 3.4100372658940614e-06,
+      "protected_layer_mass_increment_tropospheric": 0.0,
+      "protected_layer_number_increment_column": 956994043904.0,
+      "protected_layer_number_increment_tropospheric": 0.0,
+      "interpretation": "Zero direct protected-layer increment does not require identical stratospheric profiles between trajectories: transport, physics, and a moving tropopause can create later differences."
+    }
+  },
+  "matched_ten_day_spinup_cross_model": {
+    "column_aod": {
+      "cells": 55296,
+      "area_fraction": 1.0,
+      "cam6_mean_AOD": 0.17947168429524224,
+      "cam7_mean_AOD": 0.18910808013956037,
+      "bias_CAM6_minus_CAM7": -0.009636395844318158,
+      "relative_global_mean_difference_percent": -5.095708145948362,
+      "rmse": 0.04076278889675862,
+      "mae": 0.021231184939665436,
+      "spatial_correlation": 0.9711010306007631,
+      "absolute_difference_p50_p90_p95": [
+        0.011743571769024077,
+        0.0446169290111818,
+        0.0718347971452458
+      ],
+      "area_fraction_within_0p01_AOD": 0.44403208015874607,
+      "area_fraction_within_0p02_AOD": 0.6897062692076654,
+      "area_fraction_within_0p05_AOD": 0.9159341689260058
+    },
+    "tropospheric_aod": {
+      "cells": 55296,
+      "area_fraction": 1.0,
+      "cam6_mean_AOD": 0.17482068685480273,
+      "cam7_mean_AOD": 0.18856361202805003,
+      "bias_CAM6_minus_CAM7": -0.013742925173247232,
+      "relative_global_mean_difference_percent": -7.288216971152921,
+      "rmse": 0.045648374236674005,
+      "mae": 0.02469325888083438,
+      "spatial_correlation": 0.964758178867743,
+      "absolute_difference_p50_p90_p95": [
+        0.013790311857465078,
+        0.054063420315674855,
+        0.08445040310963553
+      ],
+      "area_fraction_within_0p01_AOD": 0.3947097177174365,
+      "area_fraction_within_0p02_AOD": 0.6350294514106537,
+      "area_fraction_within_0p05_AOD": 0.8872205895576682
+    }
+  },
+  "historical_cam6_reproduction": {
+    "records": 248,
+    "maximum_analyzed_AOD_difference": 0.0,
+    "changed_cell_records": 0,
+    "interpretation": "Whole-column method with added profile diagnostics versus the previously accepted CAM6 integration; same 10-day spinup."
+  },
+  "comparison_limits": "Within-model pairs isolate the scaling option. Cross-model comparisons also include different meteorology, forcing, and physics.",
+  "historical_cam7_context": {
+    "reference": {
+      "case_name": "ceresmip_b08_f09_era5_modis_y2008_su3m",
+      "history_file": "/glade/work/fillmore/Data/CERES-MIP/runs/ceresmip_b08_f09_era5_modis_y2008_su3m/archive/atm/hist/ceresmip_b08_f09_era5_modis_y2008_su3m.cam.h0a.2008-07.nc",
+      "sha256": "42489c4792ba81eb62ea2571f742507e9e93ef3c6badaa94807f9b63c1e95382",
+      "validation_record": "/glade/work/fillmore/CERES-MIP/runs/records/annual-pairs-validation-20261106/ceresmip_b08_f09_era5_modis_y2008_su3m.json",
+      "field": "AODNDG_MODEL_POST",
+      "mask_field": "AODNDG_MASK",
+      "period_start": "2008-07-01T00:00:00",
+      "period_end": "2008-08-01T00:00:00",
+      "observation_source": "/glade/work/tvmora/modis_c7_l2_200004_202203_f09_3hr_gls_rho05",
+      "observation_template": "%y/%m/%d/MODIS_VIIRS_AOD_3hr_f09.%y%m%d.%s.nc",
+      "aggregation": "CAM7 archived monthly mean; CAM6 July mean of three-hourly analyzed-AOD samples",
+      "physics_context": "CAM7 is ERA5-nudged with three months spinup; CAM6 uses its FHIST meteorology with ten days spinup. Both use prognostic MAM4 and the identical MODIS C7 contract.",
+      "comparison": "Monthly total analyzed AOD on the identical f09 grid; report whole-grid metrics and metrics in grid cells with at least 10% nudge coverage in both runs.",
+      "native_AODVISdn_note": "CAM6 modal AODVISdn excludes the three prescribed volcanic bulk constituents, while total analysis diagnostics include the complete climate aerosol list; use AODNDG_MODEL_POST for the comparison."
+    },
+    "new_whole_column_minus_archived": {
+      "cells": 55296,
+      "area_fraction": 1.0,
+      "relative_global_mean_difference_percent": -0.4791842217865225,
+      "rmse": 0.003819315814112079,
+      "mae": 0.0020516897212990957,
+      "spatial_correlation": 0.9997450103909674,
+      "absolute_difference_p50_p90_p95": [
+        0.0010073764417386066,
+        0.0049939410496284975,
+        0.007711526230524259
+      ],
+      "area_fraction_within_0p01_AOD": 0.9728987598103688,
+      "area_fraction_within_0p02_AOD": 0.9959071546077884,
+      "area_fraction_within_0p05_AOD": 0.9998050738772455,
+      "new_column_mean_AOD": 0.18910808013956037,
+      "archived_mean_AOD": 0.19001861938209597,
+      "bias_new_column_minus_archived": -0.0009105392425354062
+    },
+    "limits": "The archived CAM7 mean has three-month spinup and hourly update sampling; the new matched pair has ten-day spinup and three-hour output. This comparison is context, not a reproduction gate."
+  }
+}
