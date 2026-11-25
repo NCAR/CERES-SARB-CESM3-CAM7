@@ -6,6 +6,8 @@
 
 ! AOD observations on the exact f09 grid. The trailing slash is required.
 aod_nudge_on = .true.
+! Set true for tropospheric scaling; false retains whole-column scaling.
+aod_tropo_only = .false.
 aod_obs_path = '/path/to/AOD_f09_3hr/'
 aod_obs_template = 'MODIS_VIIRS_AOD_3hr_f09.%y%m%d.%s.nc'
 aod_times_per_day = 8

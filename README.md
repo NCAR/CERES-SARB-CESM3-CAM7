@@ -37,9 +37,12 @@ with prescribed LW scattering.
   from CAM; this extension does not impose the original cases' L32 choice.
 
 The AOD constraint scales interstitial aerosol mass and number, with matching
-aerosol-water/number buffers, by a column-wide observation/model ratio before
-radiation. It runs on shortwave-radiation timesteps. The default ratio bounds
-are 0.1 to 10, and model AOD below 0.01 is left unchanged. Keep
+aerosol-water/number buffers, before radiation. By default it applies a
+column-wide observation/model ratio; the optional
+[tropospheric mode](#tropospheric-only-scaling) scales only levels below the
+diagnosed tropopause. It runs on shortwave-radiation timesteps. The default
+ratio bounds are 0.1 to 10, and model AOD below 0.01 is left unchanged (the
+eligible AOD in tropospheric mode). Keep
 `aod_aci_on = .false.`: the cloud-borne scaling option is not implemented and
 aborts if enabled.
 
@@ -60,9 +63,9 @@ Install these in `components/cam/src/physics/cam/` in the recipient's CESM tree.
 
 | File | Purpose |
 | --- | --- |
-| [aod_nudging_kernel.F90](src/cam/aod_nudging_kernel.F90) | Ratio limits, missing-observation handling, and interpolation between observation times. |
+| [aod_nudging_kernel.F90](src/cam/aod_nudging_kernel.F90) | Ratio limits, the tropospheric residual ratio and layer mask, missing-observation handling, and interpolation between observation times. |
 | [aod_nudging_obs.F90](src/cam/aod_nudging_obs.F90) | Reads gridded AOD NetCDF files, checks f09 coordinates, and supplies time-interpolated targets to CAM chunks. |
-| [aod_nudging_optics.F90](src/cam/aod_nudging_optics.F90) | Diagnoses model visible AOD through CAM optics and applies aerosol scaling to the model state. |
+| [aod_nudging_optics.F90](src/cam/aod_nudging_optics.F90) | Diagnoses model visible AOD through CAM optics, finds the tropopause with CAM's native routine, and applies aerosol scaling to the model state. |
 | [aod_nudging_intr.F90](src/cam/aod_nudging_intr.F90) | Nudging namelist, initialization, timestep driver, and `AODNDG_*` history diagnostics. |
 | [aod_optics_kernel.F90](src/cam/aod_optics_kernel.F90) | Band-overlap remapping, LW scattering reconstruction, and optical-property bounds. |
 | [aod_optics_bands.F90](src/cam/aod_optics_bands.F90) | Built-in SARB/LFL band edges, optional band override, remapping weights, and optional LW omega/g reader. |
@@ -196,9 +199,9 @@ the reader concatenates it directly with the filename.
    merge the same changes manually if the target version differs. For a
    compatible, unpatched checkout, the commands below check every patch before
    applying them together.
-4. Merge the 19 definition entries whose group is `aod_nudging_nl` or
+4. Merge the 20 definition entries whose group is `aod_nudging_nl` or
    `aod_optics_nl` from the supplied definition XML into the recipient's CAM
-   definition XML. Merge the 18 `aod_*` defaults from the supplied defaults XML
+   definition XML. Merge the 19 `aod_*` defaults from the supplied defaults XML
    into the recipient's defaults XML. `aod_obs_path` is supplied by the user
    and has no XML default. Avoid duplicating existing entries.
 5. Add the settings below to the recipient's `user_nl_cam`, run
@@ -236,6 +239,7 @@ Use assignments without enclosing namelist group delimiters; CAM's
 ```fortran
 ! AOD observations on the exact f09 grid.
 aod_nudge_on = .true.
+aod_tropo_only = .false. ! true restricts scaling to levels below the tropopause
 aod_obs_path = '/path/to/AOD_f09_3hr/'
 aod_obs_template = 'MODIS_VIIRS_AOD_3hr_f09.%y%m%d.%s.nc'
 aod_times_per_day = 8
@@ -282,6 +286,60 @@ AODNDG_OBS, AODNDG_MODEL_PRE, AODNDG_MODEL_POST, AODNDG_RATIO, AODNDG_MASK
 Inspect the ratio and mask together: a valid observation does not guarantee a
 change when the low-model-AOD guard is active.
 
+## Tropospheric-only scaling
+
+Set `aod_tropo_only = .true.`, together with `aod_nudge_on = .true.`, to
+restrict the AOD constraint to model levels strictly below the tropopause.
+The default `.false.` retains whole-column scaling.
+
+For each column and update, CAM's native `tropopause_find_cam` routine
+diagnoses the thermal tropopause with its TWMO lapse-rate method and falls
+back to CAM's tropopause climatology. CAM level indices increase downward;
+only levels below the diagnosed tropopause level are scaled, so that level
+and everything above it are left unchanged. A column without a diagnosed
+tropopause is not updated. The boundary is held fixed for the before/after
+AOD probes of each update.
+
+The model AOD of the excluded levels is subtracted from the observed column
+target, and the eligible levels are scaled by the ratio of that residual to
+their own AOD. `aod_ratio_min/max` still bound the ratio and `aod_eps` applies
+to the eligible AOD, so the target is not always reached exactly; a target
+below the excluded AOD clamps to the lower bound.
+
+To add the option to an existing installation of this extension, replace the
+three nudging modules (`aod_nudging_intr.F90`, `aod_nudging_kernel.F90`,
+`aod_nudging_optics.F90`), merge the new `aod_tropo_only` definition and
+default into CAM's namelist XML, and add its `add_default` line from
+[build-namelist.diff](src/cam/build-namelist.diff) to `bld/build-namelist`.
+The other integration patches are unchanged; do not reapply patches that are
+already installed. Then regenerate the case namelists and rebuild.
+
+With `aod_diag_on = .true.`, these additional fields can be appended to an
+instantaneous history tape in either mode:
+
+```text
+AODNDG_TROP_PRE, AODNDG_TROP_POST, AODNDG_FIXED_PRE, AODNDG_FIXED_POST,
+AODNDG_TROP_P, AODNDG_TROP_LEV, AODNDG_TROP_MASK, AODNDG_PMID,
+AODNDG_MMR_PRE, AODNDG_MMR_POST, AODNDG_NUM_PRE, AODNDG_NUM_POST
+```
+
+`TROP_*` and `FIXED_*` are the eligible and excluded AOD before and after the
+update. `TROP_P` and `TROP_LEV` give the diagnosed tropopause, `TROP_MASK` the
+levels below it, and `PMID` the midlevel pressure. `MMR_*` and `NUM_*` are
+interstitial plus bulk aerosol mass and interstitial number profiles. In
+tropospheric mode, `AODNDG_FIXED_PRE` and `AODNDG_FIXED_POST` should match and
+the direct mass and number increments at and above the tropopause level should
+be zero.
+
+To compare the modes, run two otherwise identical nudged cases that differ only
+in `aod_tropo_only`; the `.false.` case is a whole-column reference, not an
+unnudged control. Plot `Extinction_Layer_Optical_Depth` from the
+[spectral output](#spectral-output-and-verification) against `AODNDG_PMID` at
+matching times and columns, with `AODNDG_TROP_P` marked, to see where each mode
+places the adjustment. Transport and later physics can still change
+stratospheric aerosol between the two runs even though the direct increment
+there is zero.
+
 ## Spectral output and verification
 
 Each scheduled output time produces 26 separate NetCDF files, using the default
@@ -312,7 +370,11 @@ with every later CAM revision. This repository is a source/data-interface
 handoff; recipients still need to build and verify their selected case.
 
 Source provenance: `CERES-SARB-CAM7` commit
-`cd1b5d45dbf3ddfb737c3a7153b67cdf2adef254`. The Derecho optics paths above are
-recorded in that repository's `config/cesm/monthly_2008_v1.yaml`; the validated
+`cd1b5d45dbf3ddfb737c3a7153b67cdf2adef254`. The tropospheric option is from
+commit `06628de7f4cf65af192e1dd3249f15a1368dc36b`, where its paired July 2008
+runs are documented in `docs/tropospheric-scaling.md`; the build-namelist
+patch here also adds the `aod_tropo_only` default. The Derecho optics paths
+above are recorded in that repository's `config/cesm/monthly_2008_v1.yaml`;
+the validated
 table is documented in
 `docs/superpowers/specs/2026-07-08-sp3v2-lfl-lut-status.md`.
